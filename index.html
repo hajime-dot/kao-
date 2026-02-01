@@ -55,6 +55,7 @@
     }
     #main-content::-webkit-scrollbar { display: none; }
 
+    /* --- UI Components --- */
     .date-scroll {
         display: flex; gap: 12px; overflow-x: auto;
         padding: 5px 2px 15px 2px; margin-bottom: 5px;
@@ -94,6 +95,36 @@
         text-decoration: none; font-size: 12px; font-weight: 700; border: 1px solid #EEE;
     }
 
+    /* --- Money Section Styles --- */
+    .money-input-group { background: white; padding: 20px; border-radius: 16px; box-shadow: var(--shadow); margin-bottom: 20px; }
+    .form-row { margin-bottom: 15px; }
+    .form-label { font-size: 12px; font-weight: bold; color: #888; margin-bottom: 5px; display: block; }
+    .form-input { width: 100%; padding: 12px; border: 1px solid #eee; border-radius: 8px; font-size: 16px; -webkit-appearance: none;}
+    .form-select { width: 100%; padding: 12px; border: 1px solid #eee; border-radius: 8px; font-size: 16px; background: white;}
+    
+    .member-checks { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 5px; }
+    .member-check-item { 
+        padding: 8px 12px; border-radius: 20px; border: 1px solid #eee; 
+        font-size: 13px; cursor: pointer; transition: all 0.2s; user-select: none;
+    }
+    .member-check-item.checked { background: var(--text-main); color: white; border-color: var(--text-main); }
+
+    .btn-add { 
+        width: 100%; background: var(--text-main); color: white; border: none; 
+        padding: 15px; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer;
+    }
+    
+    .balance-card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f0f0f0; }
+    .balance-amt { font-weight: 800; font-size: 16px; }
+    .is-plus { color: var(--accent-green); } /* 應收 */
+    .is-minus { color: var(--accent-red); } /* 應付 */
+
+    .history-item { font-size: 13px; padding: 12px 0; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; }
+    .history-desc { font-weight: bold; }
+    .history-detail { color: #999; font-size: 11px; margin-top: 2px; }
+    .btn-delete { color: #aaa; margin-left: 10px; padding: 0 5px; cursor: pointer; }
+
+    /* --- Navigation --- */
     .bottom-nav {
         position: absolute; bottom: 0; width: 100%; height: var(--nav-height);
         background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
@@ -102,13 +133,13 @@
     }
     .nav-item { flex: 1; text-align: center; color: #bbb; font-size: 10px; cursor: pointer; }
     .nav-item.active { color: var(--text-main); }
-    .nav-icon { font-size: 22px; display: block; }
+    .nav-icon { font-size: 22px; display: block; margin-bottom: 2px;}
 
     .section { display: none; animation: fadeIn 0.3s ease; }
     .section.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    
-    /* Flight & Hotel Info Styles */
+
+    /* Flight Info Styles */
     .info-group { margin-bottom: 24px; }
     .info-header { font-size: 13px; font-weight: 800; color: var(--text-sub); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1.5px; padding-left: 5px; }
     .info-block { background: white; border-radius: 12px; padding: 15px; box-shadow: var(--shadow); margin-bottom: 10px;}
@@ -129,100 +160,111 @@
     </header>
 
     <div id="main-content">
+        
         <div id="sec-itinerary" class="section active">
             <div class="date-scroll" id="date-tabs"></div>
             <div id="cards-container"></div>
         </div>
 
-        <div id="sec-info" class="section">
+        <div id="sec-money" class="section">
+            <div class="money-input-group">
+                <h3 style="margin-top:0; margin-bottom:15px;">新增支出 (Add Expense)</h3>
+                
+                <div class="form-row">
+                    <label class="form-label">項目 (Description)</label>
+                    <input type="text" id="m-desc" class="form-input" placeholder="e.g. 晚餐, 門票...">
+                </div>
+                
+                <div class="form-row" style="display:flex; gap:10px;">
+                    <div style="flex:1;">
+                        <label class="form-label">金額 (Amount)</label>
+                        <input type="number" id="m-amt" class="form-input" placeholder="$">
+                    </div>
+                    <div style="flex:1;">
+                        <label class="form-label">付款人 (Payer)</label>
+                        <select id="m-payer" class="form-select">
+                            </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label class="form-label">分攤者 (Split with) <small onclick="toggleAllChecks()" style="float:right; color:blue; cursor:pointer;">全選/全不選</small></label>
+                    <div id="m-targets" class="member-checks">
+                        </div>
+                </div>
+
+                <button class="btn-add" onclick="addExpense()">＋ 記一筆</button>
+            </div>
+
+            <div class="info-header">結餘 (Balance Status)</div>
+            <div id="balance-list">
+                </div>
             
+            <div class="info-header" style="margin-top:20px;">紀錄 (History)</div>
+            <div id="history-list" style="background:white; padding:10px 20px; border-radius:12px; box-shadow:var(--shadow);">
+                </div>
+            <div style="text-align:center; margin-top:20px;">
+                <button onclick="clearAllData()" style="background:none; border:none; color:#ccc; font-size:12px;">⚠️ 清除所有紀錄</button>
+            </div>
+        </div>
+
+        <div id="sec-info" class="section">
             <div class="info-group">
-                <div class="info-header">住宿 (Accommodation)</div>
+                <div class="info-header">住宿</div>
                 <div class="card type-hotel" style="margin-bottom:0;">
                     <span class="card-time">Check-in 15:00 / Out 11:00</span>
                     <div class="card-title">愛河‧日央 B&B</div>
                     <div class="card-desc">高雄市前金區</div>
-                    <a href="https://www.google.com/maps/search/?api=1&query=愛河日央" target="_blank" class="btn-nav">📍 導航 (Navigate)</a>
+                    <a href="https://www.google.com/maps/search/?api=1&query=愛河日央" target="_blank" class="btn-nav">📍 導航</a>
                 </div>
             </div>
 
             <div class="info-group">
-                <div class="info-header">航班 (Flights)</div>
-                
+                <div class="info-header">航班</div>
                 <div class="info-block">
                     <div style="font-weight:bold; margin-bottom:10px; color:#333;">🇭🇰 香港 (HKG) ↔ 高雄 (KHH)</div>
-                    
                     <div class="flight-row">
-                        <div>
-                            <div class="flight-time">🛫 19/2 10:30 - 12:00</div>
-                            <div class="flight-code">AE984 / CI934</div>
-                        </div>
-                        <div style="text-align:right;">
-                            <div class="flight-ppl">健, 水, 柏, 邦</div>
-                        </div>
+                        <div><div class="flight-time">🛫 19/2 10:30</div><div class="flight-code">AE984 / CI934</div></div>
+                        <div style="text-align:right;"><div class="flight-ppl">健, 水, 柏, 邦</div></div>
                     </div>
-
                     <div class="flight-row">
-                        <div>
-                            <div class="flight-time">🛫 20/2 10:30 - 12:00</div>
-                            <div class="flight-code">CI934</div>
-                        </div>
-                        <div style="text-align:right;">
-                            <div class="flight-ppl">初 (遲一天)</div>
-                        </div>
+                        <div><div class="flight-time">🛫 20/2 10:30</div><div class="flight-code">CI934</div></div>
+                        <div style="text-align:right;"><div class="flight-ppl">初</div></div>
                     </div>
-
                     <div class="flight-row">
-                        <div>
-                            <div class="flight-time">🛬 23/2 18:00 - 19:45</div>
-                            <div class="flight-code">CI935</div>
-                        </div>
-                        <div style="text-align:right;">
-                            <div class="flight-ppl">全員回港</div>
-                        </div>
+                        <div><div class="flight-time">🛬 23/2 18:00</div><div class="flight-code">CI935</div></div>
+                        <div style="text-align:right;"><div class="flight-ppl">全員回港</div></div>
                     </div>
                 </div>
-
                 <div class="info-block">
-                    <div style="font-weight:bold; margin-bottom:10px; color:#333;">🇻🇳 胡志明 (SGN) ↔ 高雄 (KHH)</div>
-                    
+                    <div style="font-weight:bold; margin-bottom:10px; color:#333;">🇻🇳 胡志明 ↔ 高雄</div>
                     <div class="flight-row">
-                        <div>
-                            <div class="flight-time">🛫 19/2 07:35 - 11:45</div>
-                            <div class="flight-code">VJ886</div>
-                        </div>
-                        <div style="text-align:right;">
-                            <div class="flight-ppl">宜 (Boyi)</div>
-                        </div>
+                        <div><div class="flight-time">🛫 19/2 07:35</div><div class="flight-code">VJ886</div></div>
+                        <div style="text-align:right;"><div class="flight-ppl">宜 (Boyi)</div></div>
                     </div>
-
                     <div class="flight-row">
-                        <div>
-                            <div class="flight-time">🛬 23/2 12:45 - 14:55</div>
-                            <div class="flight-code">VJ885</div>
-                        </div>
-                        <div style="text-align:right;">
-                            <div class="flight-ppl">宜 (Boyi)</div>
-                        </div>
+                        <div><div class="flight-time">🛬 23/2 12:45</div><div class="flight-code">VJ885</div></div>
+                        <div style="text-align:right;"><div class="flight-ppl">宜 (Boyi)</div></div>
                     </div>
                 </div>
-
             </div>
-
+            
             <div class="info-group">
-                <div class="info-header">交通筆記</div>
-                <div class="info-block" style="font-size:13px; color:#555;">
-                    <p>🚌 <b>56A 公車</b>：鹽埕埔 - 動物園</p>
-                    <p>🚇 <b>捷運紅線</b>：三多商圈 (夜市)</p>
-                    <p>🚗 <b>Uber</b>：美濃來回約 80 分鐘</p>
+                <div class="info-header">成員</div>
+                <div class="info-block" style="padding:10px; font-size:14px; color:#555;">
+                   👯 水, 邦, 健, 初, 柏, Boyi, 琪, Sean (8人)
                 </div>
             </div>
         </div>
+
     </div>
 
     <nav class="bottom-nav">
         <div class="nav-item active" onclick="switchTab('sec-itinerary', this)">
             <span class="nav-icon">🗓️</span><span>行程</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('sec-money', this)">
+            <span class="nav-icon">💰</span><span>公數</span>
         </div>
         <div class="nav-item" onclick="switchTab('sec-info', this)">
             <span class="nav-icon">🧳</span><span>資訊</span>
@@ -231,6 +273,9 @@
 </div>
 
 <script>
+    // === 1. Data Source ===
+    const members = ['水', '邦', '健', '初', '柏', 'Boyi', '琪', 'Sean'];
+    
     const itinerary = [
         {
             date: "02/19 (四)",
@@ -246,11 +291,11 @@
             events: [
                 { time: "08:30", title: "大ㄎㄡ胖碳烤三明治", type: "food", desc: "早餐。", loc: "大ㄎㄡ胖碳烤三明治" },
                 { time: "10:00", title: "駁二藝術特區", type: "spot", desc: "初 (Cho) 12:00 抵達後會合。", loc: "駁二藝術特區" },
-                { time: "12:00", title: "CODA coffee (午餐)", type: "food", desc: "🚶 步行約 6 分鐘。", loc: "CODA coffee", tags: ["WALK 6M"] },
+                { time: "12:00", title: "CODA coffee", type: "food", desc: "🚶 步行約 6 分鐘。", loc: "CODA coffee", tags: ["WALK 6M"] },
                 { time: "13:15", title: "移動：公交 56A", type: "transport", desc: "🚌 前往動物園。", loc: "56A公車站", tags: ["BUS 56A"] },
                 { time: "13:30", title: "壽山動物園", type: "spot", desc: "看水豚。", loc: "壽山動物園" },
                 { time: "16:45", title: "移動：公交 56A", type: "transport", desc: "🚌 前往府北路站。", loc: "府北路公車站", tags: ["BUS 56A"] },
-                { time: "17:15", title: "新堀江商圈 / 夾子園", type: "spot", desc: "逛街、夾娃娃、青菜樂園。", loc: "新堀江商圈" },
+                { time: "17:15", title: "新堀江 / 夾子園", type: "spot", desc: "夾娃娃、青菜樂園。", loc: "新堀江商圈" },
                 { time: "19:40", title: "銅花精緻涮涮鍋", type: "food", desc: "高級晚餐。", loc: "銅花精緻涮涮鍋", tags: ["BOOKING"] }
             ]
         },
@@ -261,8 +306,8 @@
                 { time: "10:30", title: "Mystoto 密室逃脫", type: "spot", desc: "解謎挑戰。", loc: "Mystoto密室逃脫", tags: ["BOOKING"] },
                 { time: "12:10", title: "炸記 (午餐)", type: "food", desc: "🚶 步行約 10 分鐘。", loc: "炸記", tags: ["WALK 10M"] },
                 { time: "13:30", title: "SKM Park / 賽道", type: "spot", desc: "卡丁車。", loc: "SKM Park" },
-                { time: "18:45", title: "移動：捷運紅線", type: "transport", desc: "🚇 前往「三多商圈站」。", loc: "三多商圈站", tags: ["METRO"] },
-                { time: "19:15", title: "苓雅市場 / 自強夜市", type: "food", desc: "在地美食攻略。", loc: "自強夜市" },
+                { time: "18:45", title: "移動：捷運紅線", type: "transport", desc: "🚇 前往三多商圈。", loc: "三多商圈站", tags: ["METRO"] },
+                { time: "19:15", title: "苓雅市場 / 自強夜市", type: "food", desc: "在地美食。", loc: "自強夜市" },
                 { time: "21:00", title: "不想洗頭•越式洗髮", type: "spot", desc: "按摩放鬆。", loc: "不想洗頭越式洗髮", tags: ["BOOKING"] }
             ]
         },
@@ -271,8 +316,8 @@
             events: [
                 { time: "07:00", title: "晨間梳洗", type: "hotel", desc: "準備出發。", loc: "愛河日央" },
                 { time: "08:00", title: "大田早餐店", type: "food", desc: "🚶 步行約 3 分鐘。", loc: "大田早餐店", tags: ["WALK 3M"] },
-                { time: "10:30", title: "美濃一日遊", type: "spot", desc: "🚗 Uber 車程約 1小時20分。", loc: "美濃民俗村", tags: ["UBER 80M"] },
-                { time: "17:40", title: "阿香的廚房 (晚餐)", type: "food", desc: "辦桌料理 (Booked)。", loc: "阿香的廚房", tags: ["BOOKING"] },
+                { time: "10:30", title: "美濃一日遊", type: "spot", desc: "🚗 Uber 車程約 80分。", loc: "美濃民俗村", tags: ["UBER 80M"] },
+                { time: "17:40", title: "阿香的廚房", type: "food", desc: "辦桌料理 (Booked)。", loc: "阿香的廚房", tags: ["BOOKING"] },
                 { time: "20:30", title: "返回休息", type: "hotel", desc: "休息充電。", loc: "愛河日央" }
             ]
         },
@@ -280,8 +325,8 @@
             date: "02/23 (一)",
             events: [
                 { time: "07:30", title: "Check-out", type: "hotel", desc: "梳洗 & 退房。", loc: "愛河日央" },
-                { time: "09:00", title: "晨間廚房 (早餐)", type: "food", desc: "👋 與 Boyi 道別 (Bye Bye)。", loc: "晨間廚房前金成功店" },
-                { time: "10:00", title: "修補遺憾時間", type: "spot", desc: "去沒去到的地方 / 買伴手禮。", loc: "高雄市" },
+                { time: "09:00", title: "晨間廚房", type: "food", desc: "👋 與 Boyi 道別。", loc: "晨間廚房前金成功店" },
+                { time: "10:00", title: "修補遺憾時間", type: "spot", desc: "最後購物。", loc: "高雄市" },
                 { time: "12:00", title: "Boyi 前往機場", type: "transport", desc: "✈️ Boyi 12:45 起飛。", loc: "小港機場", tags: ["VJ885"] },
                 { time: "16:00", title: "抵達機場 (HK組)", type: "transport", desc: "辦理登機。", loc: "小港機場" },
                 { time: "18:00", title: "返程 CI935", type: "transport", desc: "✈️ KHH -> HKG。", loc: "小港機場", tags: ["HOME"] }
@@ -289,7 +334,13 @@
         }
     ];
 
-    function init() { renderDateTabs(); renderCards(0); }
+    // === 2. Core Init & Itinerary Logic ===
+    function init() { 
+        renderDateTabs(); 
+        renderCards(0); 
+        initMoneySection();
+        updateBalance();
+    }
 
     function renderDateTabs() {
         const container = document.getElementById('date-tabs');
@@ -321,7 +372,6 @@
             }).join('') : '';
             
             const mapLink = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(event.loc);
-
             card.innerHTML = `
                 <span class="card-time">${event.time}</span>
                 <div class="card-title">${event.title}</div>
@@ -340,7 +390,165 @@
         navElement.classList.add('active');
     }
 
+    // === 3. Money / Expense Logic ===
+    let expenses = JSON.parse(localStorage.getItem('khh_expenses')) || [];
+
+    function initMoneySection() {
+        // Populate Payer Select
+        const payerSelect = document.getElementById('m-payer');
+        const targetDiv = document.getElementById('m-targets');
+        
+        members.forEach((m, idx) => {
+            // Payer Options
+            let opt = document.createElement('option');
+            opt.value = m;
+            opt.innerText = m;
+            payerSelect.appendChild(opt);
+
+            // Target Checks
+            let chip = document.createElement('div');
+            chip.className = 'member-check-item checked';
+            chip.innerText = m;
+            chip.dataset.name = m;
+            chip.onclick = function() { this.classList.toggle('checked'); };
+            targetDiv.appendChild(chip);
+        });
+    }
+
+    function toggleAllChecks() {
+        const all = document.querySelectorAll('.member-check-item');
+        const anyUnchecked = Array.from(all).some(el => !el.classList.contains('checked'));
+        all.forEach(el => {
+            if(anyUnchecked) el.classList.add('checked');
+            else el.classList.remove('checked');
+        });
+    }
+
+    function addExpense() {
+        const desc = document.getElementById('m-desc').value;
+        const amt = parseFloat(document.getElementById('m-amt').value);
+        const payer = document.getElementById('m-payer').value;
+        
+        const checkedEls = document.querySelectorAll('.member-check-item.checked');
+        const targets = Array.from(checkedEls).map(el => el.dataset.name);
+
+        if(!desc || isNaN(amt) || targets.length === 0) {
+            alert("請輸入項目、金額，並至少選擇一個分攤者。");
+            return;
+        }
+
+        const expense = {
+            id: Date.now(),
+            desc: desc,
+            amt: amt,
+            payer: payer,
+            targets: targets,
+            timestamp: new Date().toLocaleString()
+        };
+
+        expenses.push(expense);
+        saveAndRender();
+        
+        // Clear inputs
+        document.getElementById('m-desc').value = '';
+        document.getElementById('m-amt').value = '';
+    }
+
+    function deleteExpense(id) {
+        if(confirm("確定刪除這筆紀錄？")) {
+            expenses = expenses.filter(e => e.id !== id);
+            saveAndRender();
+        }
+    }
+
+    function clearAllData() {
+        if(confirm("⚠️ 警告：這將刪除所有記帳資料且無法復原！確定嗎？")) {
+            expenses = [];
+            saveAndRender();
+        }
+    }
+
+    function saveAndRender() {
+        localStorage.setItem('khh_expenses', JSON.stringify(expenses));
+        updateBalance();
+    }
+
+    function updateBalance() {
+        // Init Balances
+        let balances = {};
+        members.forEach(m => balances[m] = 0);
+
+        const historyDiv = document.getElementById('history-list');
+        historyDiv.innerHTML = '';
+
+        // Calculate
+        expenses.forEach(exp => {
+            // Payer paid full amount (+ for payer)
+            balances[exp.payer] += exp.amt;
+            
+            // Split amount per person
+            const splitAmt = exp.amt / exp.targets.length;
+            
+            // Subtract from targets (- for consumer)
+            exp.targets.forEach(t => {
+                if(balances[t] !== undefined) {
+                    balances[t] -= splitAmt;
+                }
+            });
+
+            // Render History
+            let item = document.createElement('div');
+            item.className = 'history-item';
+            item.innerHTML = `
+                <div>
+                    <div class="history-desc">${exp.desc} <span style="color:#888; font-weight:normal;">$${exp.amt}</span></div>
+                    <div class="history-detail">${exp.payer} 付款 → 分給 ${exp.targets.length} 人</div>
+                </div>
+                <div style="display:flex; align-items:center;">
+                    <span style="font-size:11px; color:#ccc;">${exp.timestamp.split(' ')[0]}</span>
+                    <span class="btn-delete" onclick="deleteExpense(${exp.id})">✖</span>
+                </div>
+            `;
+            historyDiv.prepend(item); // Newest first
+        });
+
+        // Render Balance List
+        const balDiv = document.getElementById('balance-list');
+        balDiv.innerHTML = '';
+        
+        // Sort by amount
+        let sortedMembers = Object.keys(balances).sort((a,b) => balances[b] - balances[a]);
+
+        sortedMembers.forEach(m => {
+            const val = balances[m];
+            if(Math.abs(val) < 1) return; // Hide 0
+
+            let row = document.createElement('div');
+            row.className = 'balance-card';
+            
+            const isPlus = val > 0;
+            const colorClass = isPlus ? 'is-plus' : 'is-minus';
+            const statusText = isPlus ? '應收 (Get)' : '應付 (Pay)';
+            
+            row.innerHTML = `
+                <div>
+                    <div style="font-weight:bold; font-size:15px;">${m}</div>
+                    <div style="font-size:12px; color:#888;">${statusText}</div>
+                </div>
+                <div class="balance-amt ${colorClass}">
+                    ${isPlus ? '+' : ''}${Math.round(val)}
+                </div>
+            `;
+            balDiv.appendChild(row);
+        });
+        
+        if(expenses.length === 0) {
+            historyDiv.innerHTML = '<div style="text-align:center; color:#ccc; padding:20px;">尚無紀錄</div>';
+        }
+    }
+
     init();
+
 </script>
 </body>
 </html>
