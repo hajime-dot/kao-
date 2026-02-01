@@ -8,6 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#F7F7F5">
+<link rel="apple-touch-icon" href="https://img.icons8.com/color/180/taiwan-map.png">
 
 <style>
     :root {
@@ -19,7 +20,7 @@
         --accent-red: #D9534F;
         --accent-orange: #E09B6B;
         --accent-purple: #9E8FB2;
-        --accent-blue: #5B84B1; /* 交通藍 */
+        --accent-blue: #5B84B1;
         --nav-height: 80px;
         --shadow: 0 4px 12px rgba(0,0,0,0.08);
     }
@@ -75,7 +76,7 @@
     
     .card.type-food { border-left-color: var(--accent-orange); }
     .card.type-spot { border-left-color: var(--accent-green); }
-    .card.type-transport { border-left-color: var(--accent-blue); background-color: #F0F4F8; }
+    .card.type-transport { border-left-color: var(--accent-blue); background-color: #F8FAFC; }
     .card.type-hotel { border-left-color: var(--accent-purple); }
 
     .card-time { font-size: 13px; color: var(--text-sub); font-weight: 700; margin-bottom: 6px; display: block; }
@@ -85,6 +86,7 @@
     .tag { display: inline-block; font-size: 11px; padding: 3px 8px; border-radius: 5px; margin-right: 5px; font-weight: 700; }
     .tag-bus { background: #E1E8ED; color: var(--accent-blue); }
     .tag-booking { background: #FFEBEE; color: var(--accent-red); }
+    .tag-walk { background: #E8F5E9; color: #2E7D32; }
 
     .btn-nav {
         display: inline-flex; align-items: center; background: #FFF;
@@ -105,6 +107,17 @@
     .section { display: none; animation: fadeIn 0.3s ease; }
     .section.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    
+    /* Flight & Hotel Info Styles */
+    .info-group { margin-bottom: 24px; }
+    .info-header { font-size: 13px; font-weight: 800; color: var(--text-sub); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1.5px; padding-left: 5px; }
+    .info-block { background: white; border-radius: 12px; padding: 15px; box-shadow: var(--shadow); margin-bottom: 10px;}
+    .flight-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; border-bottom: 1px solid #f0f0f0; padding-bottom: 8px;}
+    .flight-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .flight-time { font-weight: bold; color: #333; }
+    .flight-code { color: #666; font-size: 12px; }
+    .flight-ppl { font-size: 11px; color: var(--accent-blue); margin-top: 2px;}
+
 </style>
 </head>
 <body>
@@ -122,10 +135,87 @@
         </div>
 
         <div id="sec-info" class="section">
-            <div style="padding: 20px; background: white; border-radius: 16px; box-shadow: var(--shadow);">
-                <h3 style="margin-top:0;">常用交通資訊</h3>
-                <p>🚌 <b>56A 壽山動物園專線</b><br>主要往返：高雄車站 - 鹽埕埔 - 壽山動物園</p>
-                <p>🚇 <b>捷運紅線</b><br>三多商圈站 (自強夜市/苓雅市場)</p>
+            
+            <div class="info-group">
+                <div class="info-header">住宿 (Accommodation)</div>
+                <div class="card type-hotel" style="margin-bottom:0;">
+                    <span class="card-time">Check-in 15:00 / Out 11:00</span>
+                    <div class="card-title">愛河‧日央 B&B</div>
+                    <div class="card-desc">高雄市前金區</div>
+                    <a href="https://www.google.com/maps/search/?api=1&query=愛河日央" target="_blank" class="btn-nav">📍 導航 (Navigate)</a>
+                </div>
+            </div>
+
+            <div class="info-group">
+                <div class="info-header">航班 (Flights)</div>
+                
+                <div class="info-block">
+                    <div style="font-weight:bold; margin-bottom:10px; color:#333;">🇭🇰 香港 (HKG) ↔ 高雄 (KHH)</div>
+                    
+                    <div class="flight-row">
+                        <div>
+                            <div class="flight-time">🛫 19/2 10:30 - 12:00</div>
+                            <div class="flight-code">AE984 / CI934</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div class="flight-ppl">健, 水, 柏, 邦</div>
+                        </div>
+                    </div>
+
+                    <div class="flight-row">
+                        <div>
+                            <div class="flight-time">🛫 20/2 10:30 - 12:00</div>
+                            <div class="flight-code">CI934</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div class="flight-ppl">初 (遲一天)</div>
+                        </div>
+                    </div>
+
+                    <div class="flight-row">
+                        <div>
+                            <div class="flight-time">🛬 23/2 18:00 - 19:45</div>
+                            <div class="flight-code">CI935</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div class="flight-ppl">全員回港</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-block">
+                    <div style="font-weight:bold; margin-bottom:10px; color:#333;">🇻🇳 胡志明 (SGN) ↔ 高雄 (KHH)</div>
+                    
+                    <div class="flight-row">
+                        <div>
+                            <div class="flight-time">🛫 19/2 07:35 - 11:45</div>
+                            <div class="flight-code">VJ886</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div class="flight-ppl">宜 (Boyi)</div>
+                        </div>
+                    </div>
+
+                    <div class="flight-row">
+                        <div>
+                            <div class="flight-time">🛬 23/2 12:45 - 14:55</div>
+                            <div class="flight-code">VJ885</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div class="flight-ppl">宜 (Boyi)</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="info-group">
+                <div class="info-header">交通筆記</div>
+                <div class="info-block" style="font-size:13px; color:#555;">
+                    <p>🚌 <b>56A 公車</b>：鹽埕埔 - 動物園</p>
+                    <p>🚇 <b>捷運紅線</b>：三多商圈 (夜市)</p>
+                    <p>🚗 <b>Uber</b>：美濃來回約 80 分鐘</p>
+                </div>
             </div>
         </div>
     </div>
@@ -135,7 +225,7 @@
             <span class="nav-icon">🗓️</span><span>行程</span>
         </div>
         <div class="nav-item" onclick="switchTab('sec-info', this)">
-            <span class="nav-icon">🚌</span><span>交通</span>
+            <span class="nav-icon">🧳</span><span>資訊</span>
         </div>
     </nav>
 </div>
@@ -145,7 +235,8 @@
         {
             date: "02/19 (四)",
             events: [
-                { time: "10:30", title: "CI934 起飛", type: "transport", desc: "前往高雄。", loc: "桃園機場" },
+                { time: "10:30", title: "起飛 HKG->KHH", type: "transport", desc: "健水柏邦出發 (CI934)。", loc: "香港國際機場" },
+                { time: "13:00", title: "小港機場集合", type: "transport", desc: "與 Boyi 會合。", loc: "高雄小港機場" },
                 { time: "15:00", title: "飯店 Check-in", type: "hotel", desc: "行李放置。", loc: "愛河日央" },
                 { time: "19:30", title: "酒肉武林", type: "food", desc: "晚餐時光。", loc: "酒肉武林", tags: ["BOOKING"] }
             ]
@@ -154,12 +245,12 @@
             date: "02/20 (五)",
             events: [
                 { time: "08:30", title: "大ㄎㄡ胖碳烤三明治", type: "food", desc: "早餐。", loc: "大ㄎㄡ胖碳烤三明治" },
-                { time: "10:00", title: "駁二藝術特區", type: "spot", desc: "散步拍照。", loc: "駁二藝術特區" },
-                { time: "12:00", title: "CODA coffee (午餐)", type: "food", desc: "🚶 步行約 6 分鐘。", loc: "CODA coffee" },
-                { time: "13:15", title: "移動：公交 56A", type: "transport", desc: "🚌 乘車前往「壽山動物園」。", loc: "56A公車站", tags: ["BUS 56A"] },
+                { time: "10:00", title: "駁二藝術特區", type: "spot", desc: "初 (Cho) 12:00 抵達後會合。", loc: "駁二藝術特區" },
+                { time: "12:00", title: "CODA coffee (午餐)", type: "food", desc: "🚶 步行約 6 分鐘。", loc: "CODA coffee", tags: ["WALK 6M"] },
+                { time: "13:15", title: "移動：公交 56A", type: "transport", desc: "🚌 前往動物園。", loc: "56A公車站", tags: ["BUS 56A"] },
                 { time: "13:30", title: "壽山動物園", type: "spot", desc: "看水豚。", loc: "壽山動物園" },
-                { time: "16:45", title: "移動：公交 56A", type: "transport", desc: "🚌 離開動物園，前往「府北路」站。", loc: "府北路公車站", tags: ["BUS 56A"] },
-                { time: "17:15", title: "新堀江商圈 / 夾子園", type: "spot", desc: "逛街、夾娃娃。包含青菜樂園。", loc: "新堀江商圈" },
+                { time: "16:45", title: "移動：公交 56A", type: "transport", desc: "🚌 前往府北路站。", loc: "府北路公車站", tags: ["BUS 56A"] },
+                { time: "17:15", title: "新堀江商圈 / 夾子園", type: "spot", desc: "逛街、夾娃娃、青菜樂園。", loc: "新堀江商圈" },
                 { time: "19:40", title: "銅花精緻涮涮鍋", type: "food", desc: "高級晚餐。", loc: "銅花精緻涮涮鍋", tags: ["BOOKING"] }
             ]
         },
@@ -168,7 +259,7 @@
             events: [
                 { time: "09:00", title: "興隆居", type: "food", desc: "早餐。", loc: "興隆居" },
                 { time: "10:30", title: "Mystoto 密室逃脫", type: "spot", desc: "解謎挑戰。", loc: "Mystoto密室逃脫", tags: ["BOOKING"] },
-                { time: "12:10", title: "炸記 (午餐)", type: "food", desc: "🚶 步行約 10 分鐘。", loc: "炸記" },
+                { time: "12:10", title: "炸記 (午餐)", type: "food", desc: "🚶 步行約 10 分鐘。", loc: "炸記", tags: ["WALK 10M"] },
                 { time: "13:30", title: "SKM Park / 賽道", type: "spot", desc: "卡丁車。", loc: "SKM Park" },
                 { time: "18:45", title: "移動：捷運紅線", type: "transport", desc: "🚇 前往「三多商圈站」。", loc: "三多商圈站", tags: ["METRO"] },
                 { time: "19:15", title: "苓雅市場 / 自強夜市", type: "food", desc: "在地美食攻略。", loc: "自強夜市" },
@@ -178,15 +269,22 @@
         {
             date: "02/22 (日)",
             events: [
-                { time: "10:30", title: "美濃一日遊", type: "spot", desc: "客家文化。", loc: "美濃民俗村" },
-                { time: "17:40", title: "阿香的廚房", type: "food", desc: "原民餐。", loc: "阿香的廚房", tags: ["BOOKING"] }
+                { time: "07:00", title: "晨間梳洗", type: "hotel", desc: "準備出發。", loc: "愛河日央" },
+                { time: "08:00", title: "大田早餐店", type: "food", desc: "🚶 步行約 3 分鐘。", loc: "大田早餐店", tags: ["WALK 3M"] },
+                { time: "10:30", title: "美濃一日遊", type: "spot", desc: "🚗 Uber 車程約 1小時20分。", loc: "美濃民俗村", tags: ["UBER 80M"] },
+                { time: "17:40", title: "阿香的廚房 (晚餐)", type: "food", desc: "辦桌料理 (Booked)。", loc: "阿香的廚房", tags: ["BOOKING"] },
+                { time: "20:30", title: "返回休息", type: "hotel", desc: "休息充電。", loc: "愛河日央" }
             ]
         },
         {
             date: "02/23 (一)",
             events: [
-                { time: "11:00", title: "Check-out", type: "hotel", loc: "愛河日央" },
-                { time: "12:45", title: "返程航班", type: "transport", loc: "小港機場" }
+                { time: "07:30", title: "Check-out", type: "hotel", desc: "梳洗 & 退房。", loc: "愛河日央" },
+                { time: "09:00", title: "晨間廚房 (早餐)", type: "food", desc: "👋 與 Boyi 道別 (Bye Bye)。", loc: "晨間廚房前金成功店" },
+                { time: "10:00", title: "修補遺憾時間", type: "spot", desc: "去沒去到的地方 / 買伴手禮。", loc: "高雄市" },
+                { time: "12:00", title: "Boyi 前往機場", type: "transport", desc: "✈️ Boyi 12:45 起飛。", loc: "小港機場", tags: ["VJ885"] },
+                { time: "16:00", title: "抵達機場 (HK組)", type: "transport", desc: "辦理登機。", loc: "小港機場" },
+                { time: "18:00", title: "返程 CI935", type: "transport", desc: "✈️ KHH -> HKG。", loc: "小港機場", tags: ["HOME"] }
             ]
         }
     ];
@@ -215,13 +313,21 @@
         itinerary[dayIndex].events.forEach(event => {
             const card = document.createElement('div');
             card.className = `card type-${event.type}`;
-            let tagsHtml = event.tags ? event.tags.map(tag => `<span class="tag ${tag.includes('BUS') ? 'tag-bus' : 'tag-booking'}">${tag}</span>`).join('') : '';
+            let tagsHtml = event.tags ? event.tags.map(tag => {
+                let cls = 'tag-booking';
+                if(tag.includes('WALK')) cls = 'tag-walk';
+                if(tag.includes('BUS') || tag.includes('UBER') || tag.includes('METRO')) cls = 'tag-bus';
+                return `<span class="tag ${cls}">${tag}</span>`;
+            }).join('') : '';
+            
+            const mapLink = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(event.loc);
+
             card.innerHTML = `
                 <span class="card-time">${event.time}</span>
                 <div class="card-title">${event.title}</div>
                 <div class="card-desc">${event.desc}</div>
                 ${tagsHtml ? `<div style="margin-bottom:10px;">${tagsHtml}</div>` : ''}
-                <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.loc)}" target="_blank" class="btn-nav">📍 導航</a>
+                <a href="${mapLink}" target="_blank" class="btn-nav">📍 導航</a>
             `;
             container.appendChild(card);
         });
