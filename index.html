@@ -119,10 +119,23 @@
     .is-plus { color: var(--accent-green); } /* 應收 */
     .is-minus { color: var(--accent-red); } /* 應付 */
 
-    .history-item { font-size: 13px; padding: 12px 0; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; }
+    .history-item { font-size: 13px; padding: 12px 0; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
     .history-desc { font-weight: bold; }
     .history-detail { color: #999; font-size: 11px; margin-top: 2px; }
-    .btn-delete { color: #aaa; margin-left: 10px; padding: 0 5px; cursor: pointer; }
+    
+    /* FIX: Button Style for iPhone */
+    .btn-delete { 
+        background-color: transparent;
+        border: 1px solid #ffcccc;
+        color: var(--accent-red); 
+        margin-left: 10px; 
+        padding: 5px 12px; /* Bigger touch area */
+        cursor: pointer; 
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: bold;
+    }
+    .btn-delete:active { background-color: #ffebeb; }
 
     /* --- Navigation --- */
     .bottom-nav {
@@ -393,10 +406,22 @@
     // === 3. Money / Expense Logic ===
     let expenses = JSON.parse(localStorage.getItem('khh_expenses')) || [];
 
+    // Make function global for onclick
+    window.deleteExpense = function(id) {
+        if(confirm("確定刪除這筆紀錄？")) {
+            expenses = expenses.filter(e => e.id !== id);
+            saveAndRender();
+        }
+    }
+
     function initMoneySection() {
         // Populate Payer Select
         const payerSelect = document.getElementById('m-payer');
         const targetDiv = document.getElementById('m-targets');
+        
+        // Prevent duplicate appending if re-init
+        payerSelect.innerHTML = '';
+        targetDiv.innerHTML = '';
         
         members.forEach((m, idx) => {
             // Payer Options
@@ -415,7 +440,7 @@
         });
     }
 
-    function toggleAllChecks() {
+    window.toggleAllChecks = function() {
         const all = document.querySelectorAll('.member-check-item');
         const anyUnchecked = Array.from(all).some(el => !el.classList.contains('checked'));
         all.forEach(el => {
@@ -424,7 +449,7 @@
         });
     }
 
-    function addExpense() {
+    window.addExpense = function() {
         const desc = document.getElementById('m-desc').value;
         const amt = parseFloat(document.getElementById('m-amt').value);
         const payer = document.getElementById('m-payer').value;
@@ -454,14 +479,7 @@
         document.getElementById('m-amt').value = '';
     }
 
-    function deleteExpense(id) {
-        if(confirm("確定刪除這筆紀錄？")) {
-            expenses = expenses.filter(e => e.id !== id);
-            saveAndRender();
-        }
-    }
-
-    function clearAllData() {
+    window.clearAllData = function() {
         if(confirm("⚠️ 警告：這將刪除所有記帳資料且無法復原！確定嗎？")) {
             expenses = [];
             saveAndRender();
@@ -499,14 +517,16 @@
             // Render History
             let item = document.createElement('div');
             item.className = 'history-item';
+            
+            // CHANGED: Use <button> for delete to ensure iOS works
             item.innerHTML = `
                 <div>
                     <div class="history-desc">${exp.desc} <span style="color:#888; font-weight:normal;">$${exp.amt}</span></div>
                     <div class="history-detail">${exp.payer} 付款 → 分給 ${exp.targets.length} 人</div>
                 </div>
                 <div style="display:flex; align-items:center;">
-                    <span style="font-size:11px; color:#ccc;">${exp.timestamp.split(' ')[0]}</span>
-                    <span class="btn-delete" onclick="deleteExpense(${exp.id})">✖</span>
+                    <span style="font-size:11px; color:#ccc; margin-right:5px;">${exp.timestamp.split(' ')[0]}</span>
+                    <button class="btn-delete" type="button" onclick="deleteExpense(${exp.id})">✖</button>
                 </div>
             `;
             historyDiv.prepend(item); // Newest first
