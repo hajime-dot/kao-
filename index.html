@@ -3,33 +3,46 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>高雄旅人手札</title>
+<title>Gogogo 高雄</title>
 
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#F7F7F5">
+<meta name="theme-color" content="#FFFFFF">
 <link rel="apple-touch-icon" href="https://img.icons8.com/color/180/taiwan-map.png">
 
 <style>
     :root {
-        --bg-color: #F7F7F5;
-        --card-bg: #FFFFFF;
-        --text-main: #3E3E3E;
-        --text-sub: #888888;
-        --accent-green: #7D9D9C;
-        --accent-red: #D9534F;
-        --accent-orange: #E09B6B;
-        --accent-purple: #9E8FB2;
-        --accent-blue: #5B84B1;
-        --nav-height: 80px;
-        --shadow: 0 4px 12px rgba(0,0,0,0.08);
+        /* Palette: Fresh & Light */
+        --bg-body: #F5F7FA;
+        --bg-card: #FFFFFF;
+        
+        --primary: #4ECDC4; /* Tiffany/Mint Green */
+        --primary-dark: #36B0A8;
+        --secondary: #FF6B6B; /* Soft Coral for alerts/money */
+        
+        --text-main: #2D3436;
+        --text-light: #636E72;
+        --text-lighter: #B2BEC3;
+
+        /* Category Colors */
+        --cat-food-bg: #FFF3E0; --cat-food-text: #FF9800;
+        --cat-spot-bg: #E8F5E9; --cat-spot-text: #4CAF50;
+        --cat-transport-bg: #E3F2FD; --cat-transport-text: #2196F3;
+        --cat-hotel-bg: #F3E5F5; --cat-hotel-text: #9C27B0;
+
+        --shadow-soft: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+        --radius-l: 24px;
+        --radius-m: 16px;
+        --radius-s: 12px;
+        
+        --nav-height: 85px;
     }
 
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
     
     body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        background-color: var(--bg-color);
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background-color: var(--bg-body);
         margin: 0; padding: 0;
         display: flex; justify-content: center;
         height: 100dvh; color: var(--text-main);
@@ -38,235 +51,316 @@
 
     #app-container {
         width: 100%; max-width: 500px;
-        background-color: var(--bg-color);
+        background-color: var(--bg-body);
         height: 100%; position: relative;
         display: flex; flex-direction: column;
     }
 
-    header { padding: 40px 20px 10px; background: var(--bg-color); flex-shrink: 0; }
-    h1 { margin: 0; font-size: 26px; font-weight: 800; letter-spacing: 1px; }
-    .subtitle { font-size: 14px; color: var(--text-sub); margin-top: 5px; font-weight: 500; }
+    /* --- Header & Countdown --- */
+    header { 
+        padding: 50px 24px 10px; 
+        background: var(--bg-body);
+        flex-shrink: 0; 
+    }
+    
+    .header-top { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; }
+    h1 { margin: 0; font-size: 32px; font-weight: 800; letter-spacing: -0.5px; color: var(--text-main); background: -webkit-linear-gradient(45deg, #2D3436, #636E72); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    
+    /* Countdown Widget */
+    .countdown-box {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        padding: 20px; border-radius: var(--radius-l);
+        color: white; margin-bottom: 10px;
+        box-shadow: 0 10px 20px -5px rgba(78, 205, 196, 0.4);
+        position: relative; overflow: hidden;
+    }
+    .countdown-box::after {
+        content: "✈️"; position: absolute; right: -10px; bottom: -10px; font-size: 80px; opacity: 0.2; transform: rotate(-15deg);
+    }
+    .cd-label { font-size: 13px; font-weight: 600; opacity: 0.9; margin-bottom: 8px; letter-spacing: 1px; text-transform: uppercase;}
+    .cd-timer { display: flex; gap: 15px; }
+    .cd-item { text-align: center; }
+    .cd-num { font-size: 28px; font-weight: 800; line-height: 1; text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .cd-unit { font-size: 10px; opacity: 0.8; font-weight: 500; margin-top: 2px;}
 
     #main-content {
         flex: 1; overflow-y: auto;
-        padding: 10px 20px 100px;
+        padding: 10px 24px 110px; /* Bottom padding for nav */
         scroll-behavior: smooth;
         -webkit-overflow-scrolling: touch;
     }
     #main-content::-webkit-scrollbar { display: none; }
 
-    /* --- UI Components --- */
+    /* --- Date Tabs --- */
     .date-scroll {
         display: flex; gap: 12px; overflow-x: auto;
-        padding: 5px 2px 15px 2px; margin-bottom: 5px;
+        padding: 5px 2px 20px 2px;
     }
     .date-scroll::-webkit-scrollbar { display: none; }
     
     .date-chip {
-        background: var(--card-bg); padding: 10px 18px; border-radius: 24px;
-        font-size: 14px; white-space: nowrap; color: var(--text-sub);
-        box-shadow: 0 2px 5px rgba(0,0,0,0.05); font-weight: 500; cursor: pointer;
+        background: var(--bg-card); padding: 12px 20px; border-radius: 30px;
+        font-size: 14px; white-space: nowrap; color: var(--text-light);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.03); font-weight: 600; cursor: pointer;
+        border: 1px solid transparent; transition: all 0.2s ease;
     }
-    .date-chip.active { background: var(--text-main); color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+    .date-chip.active { 
+        background: var(--text-main); color: white; 
+        box-shadow: 0 8px 15px rgba(0,0,0,0.15); 
+        transform: translateY(-2px);
+    }
 
+    /* --- Cards --- */
     .card {
-        background: var(--card-bg); border-radius: 16px; padding: 18px;
-        margin-bottom: 16px; box-shadow: var(--shadow);
-        position: relative; border-left: 5px solid #ddd;
+        background: var(--bg-card); border-radius: var(--radius-l); padding: 20px;
+        margin-bottom: 20px; box-shadow: var(--shadow-soft);
+        position: relative; border: 1px solid rgba(0,0,0,0.02);
+        transition: transform 0.2s;
     }
-    
-    .card.type-food { border-left-color: var(--accent-orange); }
-    .card.type-spot { border-left-color: var(--accent-green); }
-    .card.type-transport { border-left-color: var(--accent-blue); background-color: #F8FAFC; }
-    .card.type-hotel { border-left-color: var(--accent-purple); }
+    .card:active { transform: scale(0.98); }
 
-    .card-time { font-size: 13px; color: var(--text-sub); font-weight: 700; margin-bottom: 6px; display: block; }
-    .card-title { font-size: 18px; font-weight: 800; margin-bottom: 6px; color: #222; }
-    .card-desc { font-size: 14px; color: #555; line-height: 1.5; margin-bottom: 12px; }
+    /* Category Badges */
+    .cat-badge {
+        display: inline-flex; align-items: center; justify-content: center;
+        padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 700;
+        margin-bottom: 8px; letter-spacing: 0.5px;
+    }
+    .type-food .cat-badge { background: var(--cat-food-bg); color: var(--cat-food-text); }
+    .type-spot .cat-badge { background: var(--cat-spot-bg); color: var(--cat-spot-text); }
+    .type-transport .cat-badge { background: var(--cat-transport-bg); color: var(--cat-transport-text); }
+    .type-hotel .cat-badge { background: var(--cat-hotel-bg); color: var(--cat-hotel-text); }
+
+    .card-time { font-size: 14px; color: var(--text-main); font-weight: 800; float: right; opacity: 0.6; }
+    .card-title { font-size: 18px; font-weight: 800; margin: 5px 0 8px; color: var(--text-main); line-height: 1.3; }
+    .card-desc { font-size: 14px; color: var(--text-light); line-height: 1.6; margin-bottom: 12px; }
     
-    .tag { display: inline-block; font-size: 11px; padding: 3px 8px; border-radius: 5px; margin-right: 5px; font-weight: 700; }
-    .tag-bus { background: #E1E8ED; color: var(--accent-blue); }
-    .tag-booking { background: #FFEBEE; color: var(--accent-red); }
-    .tag-walk { background: #E8F5E9; color: #2E7D32; }
+    /* Tags */
+    .tags-row { margin-bottom: 15px; display: flex; flex-wrap: wrap; gap: 6px; }
+    .tag { display: inline-block; font-size: 10px; padding: 4px 8px; border-radius: 6px; font-weight: 700; background: #F0F2F5; color: var(--text-light); }
+    .tag-booking { background: #FFF0F1; color: var(--secondary); }
 
     .btn-nav {
-        display: inline-flex; align-items: center; background: #FFF;
-        color: var(--text-main); padding: 6px 14px; border-radius: 20px;
-        text-decoration: none; font-size: 12px; font-weight: 700; border: 1px solid #EEE;
+        display: flex; align-items: center; justify-content: center;
+        background: #F8F9FA; color: var(--text-main); 
+        padding: 10px; border-radius: var(--radius-m);
+        text-decoration: none; font-size: 13px; font-weight: 700; 
+        transition: background 0.2s;
     }
+    .btn-nav:active { background: #E9ECEF; }
 
-    /* --- Money Section Styles --- */
-    .money-input-group { background: white; padding: 20px; border-radius: 16px; box-shadow: var(--shadow); margin-bottom: 20px; }
-    .form-row { margin-bottom: 15px; }
-    .form-label { font-size: 12px; font-weight: bold; color: #888; margin-bottom: 5px; display: block; }
-    .form-input { width: 100%; padding: 12px; border: 1px solid #eee; border-radius: 8px; font-size: 16px; -webkit-appearance: none;}
-    .form-select { width: 100%; padding: 12px; border: 1px solid #eee; border-radius: 8px; font-size: 16px; background: white;}
-    
-    .member-checks { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 5px; }
-    .member-check-item { 
-        padding: 8px 12px; border-radius: 20px; border: 1px solid #eee; 
-        font-size: 13px; cursor: pointer; transition: all 0.2s; user-select: none;
+    /* --- Money Section --- */
+    .money-input-group { 
+        background: var(--bg-card); padding: 24px; border-radius: var(--radius-l); 
+        box-shadow: var(--shadow-soft); margin-bottom: 24px; 
     }
-    .member-check-item.checked { background: var(--text-main); color: white; border-color: var(--text-main); }
+    
+    .input-field {
+        width: 100%; padding: 14px 16px; border: none; border-radius: var(--radius-m);
+        font-size: 16px; background: #F5F7FA; color: var(--text-main);
+        transition: box-shadow 0.2s; font-family: inherit;
+        margin-bottom: 12px;
+    }
+    .input-field:focus { box-shadow: 0 0 0 2px var(--primary); background: white; }
+    
+    .member-checks { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 20px; }
+    .member-chip { 
+        padding: 8px 14px; border-radius: 20px; background: #F5F7FA; color: var(--text-light);
+        font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; user-select: none;
+    }
+    .member-chip.checked { background: var(--text-main); color: white; transform: scale(1.05); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
 
     .btn-add { 
         width: 100%; background: var(--text-main); color: white; border: none; 
-        padding: 15px; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer;
+        padding: 16px; border-radius: var(--radius-m); font-size: 16px; font-weight: 700; 
+        cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        transition: transform 0.1s;
     }
-    
-    .balance-card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f0f0f0; }
-    .balance-amt { font-weight: 800; font-size: 16px; }
-    .is-plus { color: var(--accent-green); } /* 應收 */
-    .is-minus { color: var(--accent-red); } /* 應付 */
+    .btn-add:active { transform: scale(0.98); }
 
-    .history-item { font-size: 13px; padding: 12px 0; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
-    .history-desc { font-weight: bold; }
-    .history-detail { color: #999; font-size: 11px; margin-top: 2px; }
-    
-    /* FIX: Button Style for iPhone */
-    .btn-delete { 
-        background-color: transparent;
-        border: 1px solid #ffcccc;
-        color: var(--accent-red); 
-        margin-left: 10px; 
-        padding: 5px 12px; /* Bigger touch area */
-        cursor: pointer; 
-        border-radius: 12px;
-        font-size: 14px;
-        font-weight: bold;
+    /* Balance Cards */
+    .balance-card { 
+        background: white; border-radius: var(--radius-m); padding: 16px; margin-bottom: 12px; 
+        display: flex; justify-content: space-between; align-items: center; 
+        box-shadow: 0 2px 5px rgba(0,0,0,0.02);
     }
-    .btn-delete:active { background-color: #ffebeb; }
+    .is-plus { color: #00B894; background: #E0F7FA; padding: 4px 8px; border-radius: 6px; }
+    .is-minus { color: #FF7675; background: #FFF0F0; padding: 4px 8px; border-radius: 6px; }
+
+    .history-item { 
+        padding: 14px 0; border-bottom: 1px solid #F0F2F5; 
+        display: flex; justify-content: space-between; align-items: center; 
+    }
+    .btn-delete { 
+        background: #FFF0F0; border: none; color: #FF7675; 
+        width: 32px; height: 32px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 16px; cursor: pointer; margin-left: 10px;
+    }
 
     /* --- Navigation --- */
     .bottom-nav {
-        position: absolute; bottom: 0; width: 100%; height: var(--nav-height);
-        background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
-        display: flex; justify-content: space-around; padding-top: 10px;
-        border-top: 1px solid rgba(0,0,0,0.05); z-index: 100;
+        position: absolute; bottom: 20px; left: 20px; right: 20px; height: 70px;
+        background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+        display: flex; justify-content: space-around; align-items: center;
+        border-radius: 35px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        z-index: 100;
+        max-width: 460px; margin: 0 auto;
     }
-    .nav-item { flex: 1; text-align: center; color: #bbb; font-size: 10px; cursor: pointer; }
-    .nav-item.active { color: var(--text-main); }
-    .nav-icon { font-size: 22px; display: block; margin-bottom: 2px;}
+    .nav-item { flex: 1; text-align: center; color: #B2BEC3; transition: all 0.2s; }
+    .nav-item.active { color: var(--text-main); transform: translateY(-2px); }
+    .nav-icon { font-size: 24px; display: block; margin-bottom: 2px;}
+    .nav-label { font-size: 10px; font-weight: 700; letter-spacing: 0.5px; }
 
-    .section { display: none; animation: fadeIn 0.3s ease; }
+    .section { display: none; animation: fadeIn 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); }
     .section.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Flight Info Styles */
-    .info-group { margin-bottom: 24px; }
-    .info-header { font-size: 13px; font-weight: 800; color: var(--text-sub); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1.5px; padding-left: 5px; }
-    .info-block { background: white; border-radius: 12px; padding: 15px; box-shadow: var(--shadow); margin-bottom: 10px;}
-    .flight-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; border-bottom: 1px solid #f0f0f0; padding-bottom: 8px;}
+    /* Flight Info */
+    .info-header { font-size: 12px; font-weight: 800; color: var(--text-lighter); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; margin-top: 20px;}
+    .info-block { background: white; border-radius: var(--radius-m); padding: 20px; box-shadow: var(--shadow-soft); margin-bottom: 15px;}
+    .flight-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; border-bottom: 1px solid #F5F7FA; padding-bottom: 12px;}
     .flight-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-    .flight-time { font-weight: bold; color: #333; }
-    .flight-code { color: #666; font-size: 12px; }
-    .flight-ppl { font-size: 11px; color: var(--accent-blue); margin-top: 2px;}
-
+    
 </style>
 </head>
 <body>
 
 <div id="app-container">
     <header>
-        <h1>高雄慢旅 🇹🇼</h1>
-        <div class="subtitle" id="header-subtitle">Travel Log</div>
+        <div class="header-top">
+            <h1>Gogogo 高雄</h1>
+            <div style="font-size:24px;">🇹🇼</div>
+        </div>
+        
+        <div class="countdown-box" id="countdown-ui">
+            <div class="cd-label">Time until Takeoff</div>
+            <div class="cd-timer">
+                <div class="cd-item"><div class="cd-num" id="cd-d">--</div><div class="cd-unit">DAYS</div></div>
+                <div class="cd-item"><div class="cd-num" id="cd-h">--</div><div class="cd-unit">HRS</div></div>
+                <div class="cd-item"><div class="cd-num" id="cd-m">--</div><div class="cd-unit">MIN</div></div>
+            </div>
+        </div>
     </header>
 
     <div id="main-content">
         
         <div id="sec-itinerary" class="section active">
             <div class="date-scroll" id="date-tabs"></div>
-            <div id="cards-container"></div>
+            <div id="cards-container" style="padding-top:10px;"></div>
         </div>
 
         <div id="sec-money" class="section">
             <div class="money-input-group">
-                <h3 style="margin-top:0; margin-bottom:15px;">新增支出 (Add Expense)</h3>
+                <h3 style="margin-top:0; margin-bottom:20px; font-size:20px;">新增支出 (Add Expense)</h3>
                 
-                <div class="form-row">
-                    <label class="form-label">項目 (Description)</label>
-                    <input type="text" id="m-desc" class="form-input" placeholder="e.g. 晚餐, 門票...">
-                </div>
+                <input type="text" id="m-desc" class="input-field" placeholder="項目 (e.g. 晚餐, 門票)">
                 
-                <div class="form-row" style="display:flex; gap:10px;">
-                    <div style="flex:1;">
-                        <label class="form-label">金額 (Amount)</label>
-                        <input type="number" id="m-amt" class="form-input" placeholder="$">
-                    </div>
-                    <div style="flex:1;">
-                        <label class="form-label">付款人 (Payer)</label>
-                        <select id="m-payer" class="form-select">
+                <div style="display:flex; gap:10px;">
+                    <input type="number" id="m-amt" class="input-field" placeholder="金額 ($)" style="flex:1">
+                    <div style="position:relative; flex:1;">
+                        <select id="m-payer" class="input-field" style="appearance:none; padding-right:30px;">
                             </select>
+                        <span style="position:absolute; right:15px; top:15px; color:#aaa; pointer-events:none;">▼</span>
                     </div>
                 </div>
 
-                <div class="form-row">
-                    <label class="form-label">分攤者 (Split with) <small onclick="toggleAllChecks()" style="float:right; color:blue; cursor:pointer;">全選/全不選</small></label>
-                    <div id="m-targets" class="member-checks">
-                        </div>
+                <div style="margin-top:10px; margin-bottom:5px; font-size:12px; font-weight:bold; color:#aaa; display:flex; justify-content:space-between;">
+                    <span>分攤者 (Split with)</span>
+                    <span onclick="toggleAllChecks()" style="color:var(--primary-dark); cursor:pointer;">全選 / 取消</span>
                 </div>
+                <div id="m-targets" class="member-checks">
+                    </div>
 
                 <button class="btn-add" onclick="addExpense()">＋ 記一筆</button>
             </div>
 
             <div class="info-header">結餘 (Balance Status)</div>
-            <div id="balance-list">
-                </div>
+            <div id="balance-list"></div>
             
-            <div class="info-header" style="margin-top:20px;">紀錄 (History)</div>
-            <div id="history-list" style="background:white; padding:10px 20px; border-radius:12px; box-shadow:var(--shadow);">
-                </div>
-            <div style="text-align:center; margin-top:20px;">
-                <button onclick="clearAllData()" style="background:none; border:none; color:#ccc; font-size:12px;">⚠️ 清除所有紀錄</button>
+            <div class="info-header">紀錄 (History)</div>
+            <div id="history-list" style="background:white; padding:10px 20px; border-radius:var(--radius-m); box-shadow:var(--shadow-soft);"></div>
+            
+            <div style="text-align:center; margin-top:30px; margin-bottom:20px;">
+                <button onclick="clearAllData()" style="background:none; border:none; color:#B2BEC3; font-size:12px; font-weight:600;">⚠️ 清除所有紀錄</button>
             </div>
         </div>
 
         <div id="sec-info" class="section">
-            <div class="info-group">
-                <div class="info-header">住宿</div>
-                <div class="card type-hotel" style="margin-bottom:0;">
-                    <span class="card-time">Check-in 15:00 / Out 11:00</span>
-                    <div class="card-title">愛河‧日央 B&B</div>
-                    <div class="card-desc">高雄市前金區</div>
-                    <a href="https://www.google.com/maps/search/?api=1&query=愛河日央" target="_blank" class="btn-nav">📍 導航</a>
+            <div class="info-header">住宿 (Accommodation)</div>
+            <div class="card type-hotel" style="margin-bottom:20px;">
+                <div class="cat-badge">HOTEL</div>
+                <div class="card-title">愛河‧日央 B&B</div>
+                <div class="card-desc">高雄市前金區 • Check-in 15:00</div>
+                <a href="https://www.google.com/maps/search/?api=1&query=愛河日央" target="_blank" class="btn-nav">📍 開啟導航</a>
+            </div>
+
+            <div class="info-header">航班資訊 (Flights)</div>
+            
+            <div class="info-block">
+                <div style="font-weight:800; margin-bottom:15px; color:var(--text-main); display:flex; align-items:center;">
+                    <span style="font-size:18px; margin-right:8px;">🇭🇰</span> 香港 ↔ 高雄
+                </div>
+                
+                <div class="flight-row">
+                    <div>
+                        <div style="font-weight:700; color:var(--text-main);">19/2 🛫 10:30</div>
+                        <div style="color:var(--text-light); font-size:12px;">AE984 / CI934</div>
+                    </div>
+                    <div style="text-align:right; font-size:12px; font-weight:600; color:var(--text-lighter);">
+                        健, 水, 柏, 邦
+                    </div>
+                </div>
+
+                <div class="flight-row">
+                    <div>
+                        <div style="font-weight:700; color:var(--text-main);">20/2 🛫 10:30</div>
+                        <div style="color:var(--text-light); font-size:12px;">CI934</div>
+                    </div>
+                    <div style="text-align:right; font-size:12px; font-weight:600; color:var(--text-lighter);">
+                        初 (遲一天)
+                    </div>
+                </div>
+
+                <div class="flight-row">
+                    <div>
+                        <div style="font-weight:700; color:var(--text-main);">23/2 🛬 18:00</div>
+                        <div style="color:var(--text-light); font-size:12px;">CI935</div>
+                    </div>
+                    <div style="text-align:right; font-size:12px; font-weight:600; color:var(--text-lighter);">
+                        全員回港
+                    </div>
                 </div>
             </div>
 
-            <div class="info-group">
-                <div class="info-header">航班</div>
-                <div class="info-block">
-                    <div style="font-weight:bold; margin-bottom:10px; color:#333;">🇭🇰 香港 (HKG) ↔ 高雄 (KHH)</div>
-                    <div class="flight-row">
-                        <div><div class="flight-time">🛫 19/2 10:30</div><div class="flight-code">AE984 / CI934</div></div>
-                        <div style="text-align:right;"><div class="flight-ppl">健, 水, 柏, 邦</div></div>
+            <div class="info-block">
+                <div style="font-weight:800; margin-bottom:15px; color:var(--text-main); display:flex; align-items:center;">
+                    <span style="font-size:18px; margin-right:8px;">🇻🇳</span> 胡志明 ↔ 高雄
+                </div>
+                
+                <div class="flight-row">
+                    <div>
+                        <div style="font-weight:700; color:var(--text-main);">19/2 🛫 07:35</div>
+                        <div style="color:var(--text-light); font-size:12px;">VJ886</div>
                     </div>
-                    <div class="flight-row">
-                        <div><div class="flight-time">🛫 20/2 10:30</div><div class="flight-code">CI934</div></div>
-                        <div style="text-align:right;"><div class="flight-ppl">初</div></div>
-                    </div>
-                    <div class="flight-row">
-                        <div><div class="flight-time">🛬 23/2 18:00</div><div class="flight-code">CI935</div></div>
-                        <div style="text-align:right;"><div class="flight-ppl">全員回港</div></div>
+                    <div style="text-align:right; font-size:12px; font-weight:600; color:var(--text-lighter);">
+                        宜 (Boyi)
                     </div>
                 </div>
-                <div class="info-block">
-                    <div style="font-weight:bold; margin-bottom:10px; color:#333;">🇻🇳 胡志明 ↔ 高雄</div>
-                    <div class="flight-row">
-                        <div><div class="flight-time">🛫 19/2 07:35</div><div class="flight-code">VJ886</div></div>
-                        <div style="text-align:right;"><div class="flight-ppl">宜 (Boyi)</div></div>
+
+                <div class="flight-row">
+                    <div>
+                        <div style="font-weight:700; color:var(--text-main);">23/2 🛬 12:45</div>
+                        <div style="color:var(--text-light); font-size:12px;">VJ885</div>
                     </div>
-                    <div class="flight-row">
-                        <div><div class="flight-time">🛬 23/2 12:45</div><div class="flight-code">VJ885</div></div>
-                        <div style="text-align:right;"><div class="flight-ppl">宜 (Boyi)</div></div>
+                    <div style="text-align:right; font-size:12px; font-weight:600; color:var(--text-lighter);">
+                        宜 (Boyi)
                     </div>
                 </div>
             </div>
-            
-            <div class="info-group">
-                <div class="info-header">成員</div>
-                <div class="info-block" style="padding:10px; font-size:14px; color:#555;">
-                   👯 水, 邦, 健, 初, 柏, Boyi, 琪, Sean (8人)
-                </div>
+
+            <div class="info-header">旅伴 (Travelers)</div>
+            <div style="padding:10px 0; color:var(--text-light); font-size:14px; line-height:1.6;">
+                水, 邦, 健, 初, 柏, Boyi, 琪, Sean (共8人)
             </div>
         </div>
 
@@ -274,18 +368,44 @@
 
     <nav class="bottom-nav">
         <div class="nav-item active" onclick="switchTab('sec-itinerary', this)">
-            <span class="nav-icon">🗓️</span><span>行程</span>
+            <span class="nav-icon">🗓️</span><span class="nav-label">行程</span>
         </div>
         <div class="nav-item" onclick="switchTab('sec-money', this)">
-            <span class="nav-icon">💰</span><span>公數</span>
+            <span class="nav-icon">💸</span><span class="nav-label">公數</span>
         </div>
         <div class="nav-item" onclick="switchTab('sec-info', this)">
-            <span class="nav-icon">🧳</span><span>資訊</span>
+            <span class="nav-icon">🧳</span><span class="nav-label">資訊</span>
         </div>
     </nav>
 </div>
 
 <script>
+    // === 0. Countdown Timer Logic ===
+    function startCountdown() {
+        // Target: 2026/02/19 10:30:00 (Flight Time)
+        const targetDate = new Date("2026-02-19T10:30:00").getTime();
+
+        const timer = setInterval(function() {
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+
+            if (distance < 0) {
+                clearInterval(timer);
+                document.getElementById("countdown-ui").innerHTML = "<div style='text-align:center; font-weight:800; font-size:24px;'>ENJOY KAOHSIUNG! 🎉</div>";
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+
+            document.getElementById("cd-d").innerText = days;
+            document.getElementById("cd-h").innerText = hours;
+            document.getElementById("cd-m").innerText = minutes;
+        }, 1000);
+    }
+    startCountdown();
+
     // === 1. Data Source ===
     const members = ['水', '邦', '健', '初', '柏', 'Boyi', '琪', 'Sean'];
     
@@ -372,25 +492,27 @@
 
     function renderCards(dayIndex) {
         const container = document.getElementById('cards-container');
-        document.getElementById('header-subtitle').innerText = `Day ${dayIndex + 1} • ${itinerary[dayIndex].date}`;
         container.innerHTML = '';
         itinerary[dayIndex].events.forEach(event => {
             const card = document.createElement('div');
             card.className = `card type-${event.type}`;
+            
+            let badgeText = event.type.toUpperCase();
+            
             let tagsHtml = event.tags ? event.tags.map(tag => {
-                let cls = 'tag-booking';
-                if(tag.includes('WALK')) cls = 'tag-walk';
-                if(tag.includes('BUS') || tag.includes('UBER') || tag.includes('METRO')) cls = 'tag-bus';
-                return `<span class="tag ${cls}">${tag}</span>`;
+                let cls = 'tag';
+                if(tag.includes('BOOKING')) cls = 'tag tag-booking';
+                return `<span class="${cls}">${tag}</span>`;
             }).join('') : '';
             
             const mapLink = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(event.loc);
             card.innerHTML = `
+                <div class="cat-badge">${badgeText}</div>
                 <span class="card-time">${event.time}</span>
                 <div class="card-title">${event.title}</div>
                 <div class="card-desc">${event.desc}</div>
-                ${tagsHtml ? `<div style="margin-bottom:10px;">${tagsHtml}</div>` : ''}
-                <a href="${mapLink}" target="_blank" class="btn-nav">📍 導航</a>
+                ${tagsHtml ? `<div class="tags-row">${tagsHtml}</div>` : ''}
+                <a href="${mapLink}" target="_blank" class="btn-nav">📍 開啟地圖導航</a>
             `;
             container.appendChild(card);
         });
@@ -406,7 +528,6 @@
     // === 3. Money / Expense Logic ===
     let expenses = JSON.parse(localStorage.getItem('khh_expenses')) || [];
 
-    // Make function global for onclick
     window.deleteExpense = function(id) {
         if(confirm("確定刪除這筆紀錄？")) {
             expenses = expenses.filter(e => e.id !== id);
@@ -415,24 +536,20 @@
     }
 
     function initMoneySection() {
-        // Populate Payer Select
         const payerSelect = document.getElementById('m-payer');
         const targetDiv = document.getElementById('m-targets');
         
-        // Prevent duplicate appending if re-init
         payerSelect.innerHTML = '';
         targetDiv.innerHTML = '';
         
-        members.forEach((m, idx) => {
-            // Payer Options
+        members.forEach((m) => {
             let opt = document.createElement('option');
             opt.value = m;
             opt.innerText = m;
             payerSelect.appendChild(opt);
 
-            // Target Checks
             let chip = document.createElement('div');
-            chip.className = 'member-check-item checked';
+            chip.className = 'member-chip checked';
             chip.innerText = m;
             chip.dataset.name = m;
             chip.onclick = function() { this.classList.toggle('checked'); };
@@ -441,7 +558,7 @@
     }
 
     window.toggleAllChecks = function() {
-        const all = document.querySelectorAll('.member-check-item');
+        const all = document.querySelectorAll('.member-chip');
         const anyUnchecked = Array.from(all).some(el => !el.classList.contains('checked'));
         all.forEach(el => {
             if(anyUnchecked) el.classList.add('checked');
@@ -453,8 +570,7 @@
         const desc = document.getElementById('m-desc').value;
         const amt = parseFloat(document.getElementById('m-amt').value);
         const payer = document.getElementById('m-payer').value;
-        
-        const checkedEls = document.querySelectorAll('.member-check-item.checked');
+        const checkedEls = document.querySelectorAll('.member-chip.checked');
         const targets = Array.from(checkedEls).map(el => el.dataset.name);
 
         if(!desc || isNaN(amt) || targets.length === 0) {
@@ -474,7 +590,6 @@
         expenses.push(expense);
         saveAndRender();
         
-        // Clear inputs
         document.getElementById('m-desc').value = '';
         document.getElementById('m-amt').value = '';
     }
@@ -492,70 +607,50 @@
     }
 
     function updateBalance() {
-        // Init Balances
         let balances = {};
         members.forEach(m => balances[m] = 0);
 
         const historyDiv = document.getElementById('history-list');
         historyDiv.innerHTML = '';
 
-        // Calculate
         expenses.forEach(exp => {
-            // Payer paid full amount (+ for payer)
             balances[exp.payer] += exp.amt;
-            
-            // Split amount per person
             const splitAmt = exp.amt / exp.targets.length;
-            
-            // Subtract from targets (- for consumer)
             exp.targets.forEach(t => {
-                if(balances[t] !== undefined) {
-                    balances[t] -= splitAmt;
-                }
+                if(balances[t] !== undefined) balances[t] -= splitAmt;
             });
 
-            // Render History
             let item = document.createElement('div');
             item.className = 'history-item';
-            
-            // CHANGED: Use <button> for delete to ensure iOS works
             item.innerHTML = `
-                <div>
-                    <div class="history-desc">${exp.desc} <span style="color:#888; font-weight:normal;">$${exp.amt}</span></div>
-                    <div class="history-detail">${exp.payer} 付款 → 分給 ${exp.targets.length} 人</div>
+                <div style="flex:1;">
+                    <div style="font-weight:700; color:var(--text-main); font-size:15px;">${exp.desc} <span style="font-weight:400; color:var(--text-light);">$${exp.amt}</span></div>
+                    <div style="font-size:12px; color:var(--text-lighter); margin-top:4px;">${exp.payer} 付款 → ${exp.targets.length} 人</div>
                 </div>
-                <div style="display:flex; align-items:center;">
-                    <span style="font-size:11px; color:#ccc; margin-right:5px;">${exp.timestamp.split(' ')[0]}</span>
-                    <button class="btn-delete" type="button" onclick="deleteExpense(${exp.id})">✖</button>
-                </div>
+                <button class="btn-delete" type="button" onclick="deleteExpense(${exp.id})">✖</button>
             `;
-            historyDiv.prepend(item); // Newest first
+            historyDiv.prepend(item);
         });
 
-        // Render Balance List
         const balDiv = document.getElementById('balance-list');
         balDiv.innerHTML = '';
         
-        // Sort by amount
         let sortedMembers = Object.keys(balances).sort((a,b) => balances[b] - balances[a]);
 
         sortedMembers.forEach(m => {
             const val = balances[m];
-            if(Math.abs(val) < 1) return; // Hide 0
+            if(Math.abs(val) < 1) return;
 
             let row = document.createElement('div');
             row.className = 'balance-card';
-            
             const isPlus = val > 0;
-            const colorClass = isPlus ? 'is-plus' : 'is-minus';
-            const statusText = isPlus ? '應收 (Get)' : '應付 (Pay)';
             
             row.innerHTML = `
                 <div>
-                    <div style="font-weight:bold; font-size:15px;">${m}</div>
-                    <div style="font-size:12px; color:#888;">${statusText}</div>
+                    <div style="font-weight:700; font-size:15px;">${m}</div>
+                    <div style="font-size:11px; color:#B2BEC3;">${isPlus ? '應收 (GET)' : '應付 (PAY)'}</div>
                 </div>
-                <div class="balance-amt ${colorClass}">
+                <div style="font-weight:700; font-size:16px;" class="${isPlus ? 'is-plus' : 'is-minus'}">
                     ${isPlus ? '+' : ''}${Math.round(val)}
                 </div>
             `;
@@ -563,7 +658,7 @@
         });
         
         if(expenses.length === 0) {
-            historyDiv.innerHTML = '<div style="text-align:center; color:#ccc; padding:20px;">尚無紀錄</div>';
+            historyDiv.innerHTML = '<div style="text-align:center; color:#ddd; font-size:12px;">尚無紀錄</div>';
         }
     }
 
