@@ -123,8 +123,7 @@
 
     .card-row-top { display: flex; justify-content: space-between; margin-bottom: 6px; }
     .card-time { font-family: monospace; font-size: 14px; font-weight: 700; color: var(--text-main); }
-    .card-dur { font-size: 11px; font-weight: 700; background: #EEE; padding: 2px 6px; border-radius: 4px; color: #666; }
-
+    
     .card-title { font-size: 16px; font-weight: 800; color: var(--text-main); margin-bottom: 6px; line-height: 1.4; }
     .card-desc { font-size: 13px; color: var(--text-light); line-height: 1.5; margin-bottom: 8px; }
 
@@ -140,6 +139,14 @@
         float: right; margin-top: -5px; font-size: 12px; 
         background: #F0F3F4; padding: 6px 12px; border-radius: 20px; 
         color: var(--text-main); text-decoration: none; font-weight: 600; 
+    }
+    .btn-map-info {
+        display: inline-block; font-size: 13px; 
+        background: var(--primary); color: white;
+        padding: 8px 16px; border-radius: 20px;
+        text-decoration: none; font-weight: bold;
+        margin-top: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
 
     /* --- Money Section --- */
@@ -220,7 +227,7 @@
             <div class="card type-hotel">
                 <div class="card-title">愛河‧日央 B&B</div>
                 <div class="card-desc">高雄市前金區 • Check-in 15:00</div>
-                <a href="https://goo.gl/maps/placeholder" target="_blank" class="btn-map">地圖</a>
+                <a href="https://www.google.com/maps/search/?api=1&query=%E6%84%9B%E6%B2%B3%E6%97%A5%E5%A4%AE%20%E9%AB%98%E9%9B%84" target="_blank" class="btn-map-info">📍 導航至民宿</a>
             </div>
             <div class="card type-transport">
                 <div class="card-title">航班資訊</div>
@@ -273,7 +280,7 @@
                 { time: "13:30", end: "16:30", title: "壽山動物園", type: "spot", desc: "Join 初、琪、歡車", tags: ["Bus 56A"] },
                 { time: "17:15", end: "19:00", title: "新堀江商圈 / 夾子園", type: "spot", desc: "青菜樂園", tags: ["Bus 56A", "Uber 15m"] },
                 { time: "19:40", end: "21:30", title: "銅花精緻涮涮鍋", type: "food", desc: "豪華火鍋", tags: ["Booked", "Uber 24m"] },
-                { time: "22:00", end: "~~", title: "返去休息", type: "hotel", desc: "晚安", tags: ["Uber 15m"] }
+                { time: "22:00", end: "~~", title: "返去休息", type: "hotel", desc: "晚安", tags: ["Uber 15m"], loc: "愛河日央" }
             ]
         },
         {
@@ -286,14 +293,16 @@
                 { time: "13:30", end: "18:45", title: "SKM Park / 賽道樂園", type: "spot", desc: "Outlet + 卡丁車", tags: ["紅線->草衙站"] },
                 { time: "19:15", end: "20:30", title: "自強夜市 / 苓雅市場", type: "food", desc: "在地小吃晚餐", tags: ["紅線->三多"] },
                 { time: "21:00", end: "22:15", title: "越式洗髮", type: "spot", desc: "不想洗頭 (SPA)", tags: ["Booked", "Uber 14m"] },
-                { time: "22:30", end: "~~", title: "返去休息", type: "hotel", desc: "晚安", tags: ["Uber 9m"] }
+                { time: "22:30", end: "~~", title: "返去休息", type: "hotel", desc: "晚安", tags: ["Uber 9m"], loc: "愛河日央" }
             ]
         },
         {
             date: "22/2 (日)",
             events: [
+                { time: "08:00", end: "09:00", title: "大田早餐店", type: "food", desc: "早餐", tags: ["行 3分鐘"] },
                 { time: "10:30", end: "16:00", title: "美濃一日遊", type: "spot", desc: "客家文化 / 紙傘", tags: ["Uber 80m"] },
-                { time: "17:40", end: "19:30", title: "阿香的廚房", type: "food", desc: "原住民料理", tags: ["Booked"] }
+                { time: "17:40", end: "19:30", title: "阿香的廚房", type: "food", desc: "原住民料理", tags: ["Booked"] },
+                { time: "20:30", end: "~~", title: "返去休息", type: "hotel", desc: "整理行李", tags: ["Uber"], loc: "愛河日央" }
             ]
         },
         {
@@ -353,13 +362,14 @@
             // Tags logic
             const tagsHtml = ev.tags && ev.tags.length > 0 ? `<div class="tags-row">${makeTags(ev.tags)}</div>` : '';
             
-            // Map link
-            const mapUrl = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(ev.title + " 高雄");
+            // Map link: Use explicit 'loc' if present, otherwise use title + 高雄
+            const queryLoc = ev.loc ? ev.loc : (ev.title + " 高雄");
+            const mapUrl = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(queryLoc);
 
             card.innerHTML = `
                 <div class="card-row-top">
                     <div>${timeHtml}</div>
-                    <a href="${mapUrl}" target="_blank" class="btn-map">📍 GO</a>
+                    <a href="${mapUrl}" target="_blank" class="btn-map">GO</a>
                 </div>
                 <div class="card-title">${ev.title}</div>
                 <div class="card-desc">${ev.desc}</div>
