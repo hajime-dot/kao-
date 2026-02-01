@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>高雄旅人手札</title>
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#F7F7F5">
+<link rel="apple-touch-icon" href="https://img.icons8.com/color/180/taiwan-map.png">
+
+<style>
+    /* --- 日式極簡設計系統 (Design System) --- */
+    :root {
+        --bg-color: #F7F7F5; /* 和紙白 */
+        --card-bg: #FFFFFF;
+        --text-main: #3E3E3E; /* 墨黑 */
+        --text-sub: #888888;
+        --accent-green: #7D9D9C; /* 抹茶綠 - 一般景點 */
+        --accent-red: #D9534F; /* 茜色 - 重要預約 */
+        --accent-orange: #E09B6B; /* 杏色 - 美食 */
+        --accent-purple: #9E8FB2; /* 藤紫 - 伴手禮/住宿 */
+        --nav-height: 80px; /* 增加底部高度適應新款 iPhone */
+        --shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background-color: var(--bg-color);
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        height: 100vh; /* 使用 dvh 在手機上更準確 */
+        height: 100dvh; 
+        color: var(--text-main);
+        overflow: hidden;
+    }
+
+    /* 模擬手機容器 */
+    #app-container {
+        width: 100%;
+        max-width: 500px;
+        background-color: var(--bg-color);
+        height: 100%;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* --- Header --- */
+    header {
+        padding: 40px 20px 10px; /* 增加頂部 padding 避開瀏海 */
+        background: var(--bg-color);
+        flex-shrink: 0;
+    }
+    h1 { margin: 0; font-size: 26px; font-weight: 800; letter-spacing: 1px; color: #2c2c2c; }
+    .subtitle { font-size: 14px; color: var(--text-sub); margin-top: 5px; font-weight: 500; }
+
+    /* --- Content Area --- */
+    #main-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 10px 20px 100px; /* Bottom padding for nav */
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Hide Scrollbar */
+    #main-content::-webkit-scrollbar { display: none; }
+
+    /* --- Date Selector --- */
+    .date-scroll {
+        display: flex;
+        gap: 12px;
+        overflow-x: auto;
+        padding: 5px 2px 15px 2px;
+        margin-bottom: 5px;
+        scrollbar-width: none;
+    }
+    .date-scroll::-webkit-scrollbar { display: none; }
+    
+    .date-chip {
+        background: var(--card-bg);
+        padding: 10px 18px;
+        border-radius: 24px;
+        font-size: 14px;
+        white-space: nowrap;
+        color: var(--text-sub);
+        border: 1px solid transparent;
+        transition: all 0.2s;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        font-weight: 500;
+    }
+    .date-chip.active {
+        background: var(--text-main);
+        color: white;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        transform: translateY(-1px);
+    }
+
+    /* --- Cards --- */
+    .card {
+        background: var(--card-bg);
+        border-radius: 16px;
+        padding: 18px;
+        margin-bottom: 18px;
+        box-shadow: var(--shadow);
+        position: relative;
+        border-left: 5px solid #ddd;
+        transition: transform 0.1s;
+    }
+    .card:active { transform: scale(0.98); }
+    
+    /* Card Categories */
+    .card.type-food { border-left-color: var(--accent-orange); }
+    .card.type-spot { border-left-color: var(--accent-green); }
+    .card.type-transport { border-left-color: var(--text-sub); }
+    .card.type-hotel { border-left-color: var(--accent-purple); }
+
+    .card-time { font-size: 13px; color: var(--text-sub); font-weight: 700; margin-bottom: 6px; display: block; letter-spacing: 0.5px;}
+    .card-title { font-size: 19px; font-weight: 800; margin-bottom: 8px; color: #222; }
+    .card-desc { font-size: 15px; color: #555; line-height: 1.6; margin-bottom: 14px; }
+    
+    /* Tags */
+    .tag {
+        display: inline-block;
+        font-size: 11px;
+        padding: 4px 10px;
+        border-radius: 6px;
+        margin-right: 6px;
+        margin-bottom: 6px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+    .tag-booking { background: #FFEBEE; color: var(--accent-red); }
+    .tag-must { background: #FFF3E0; color: var(--accent-orange); }
+    .tag-tips { background: #E8F5E9; color: var(--accent-green); }
+    .tag-shopping { background: #F3E5F5; color: var(--accent-purple); }
+
+    /* Buttons */
+    .btn-nav {
+        display: inline-flex;
+        align-items: center;
+        background: #f2f2f2;
+        color: var(--text-main);
+        padding: 8px 16px;
+        border-radius: 24px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 700;
+        transition: background 0.2s;
+    }
+    .btn-nav:hover { background: #e0e0e0; }
+
+    /* --- Weather Widget --- */
+    .weather-widget {
+        background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        padding: 20px;
+        border-radius: 16px;
+        margin-bottom: 24px;
+        color: #555;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: var(--shadow);
+    }
+    .weather-info h3 { margin: 0; font-size: 18px; font-weight: 700; }
+    .weather-info p { margin: 4px 0 0 0; font-size: 13px; opacity: 0.8; font-weight: 500;}
+    .weather-icon { font-size: 32px; }
+
+    /* --- Bottom Navigation --- */
+    .bottom-nav {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: var(--nav-height);
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        display: flex;
+        justify-content: space-around;
+        align-items: flex-start;
+        padding-top: 10px;
+        border-top: 1px solid rgba(0,0,0,0.05);
+        z-index: 100;
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.03);
+    }
+    .nav-item {
+        flex: 1;
+        text-align: center;
+        color: #bbb;
+        font-size: 10px;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        transition: color 0.2s;
+    }
+    .nav-item.active { color: var(--text-main); }
+    .nav-icon { font-size: 22px; display: block; margin-bottom: 2px;}
+
+    /* --- Section Visibility --- */
+    .section { display: none; animation: fadeIn 0.3s cubic-bezier(0.25, 1, 0.5, 1); }
+    .section.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Info Lists */
+    .info-group { margin-bottom: 24px; }
+    .info-header { font-size: 13px; font-weight: 800; color: var(--text-sub); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1.5px; padding-left: 5px; }
+    .info-item { background: white; padding: 18px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; }
+    .info-item:first-child { border-top-left-radius: 16px; border-top-right-radius: 16px; }
+    .info-item:last-child { border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; border-bottom: none; box-shadow: var(--shadow); }
+    
+    .budget-table { width: 100%; border-collapse: collapse; background: white; border-radius: 16px; overflow: hidden; font-size: 14px; box-shadow: var(--shadow);}
+    .budget-table th, .budget-table td { padding: 14px 16px; text-align: left; border-bottom: 1px solid #f0f0f0; }
+    .budget-table th { background-color: #fafafa; color: #888; font-weight: 600; font-size: 13px;}
+    .budget-table tr:last-child td { border-bottom: none; }
+
+</style>
+</head>
+<body>
+
+<div id="app-container">
+    <header>
+        <h1>高雄慢旅 🇹🇼</h1>
+        <div class="subtitle" id="header-subtitle">Travel Log</div>
+    </header>
+
+    <div id="main-content">
+        
+        <div id="sec-itinerary" class="section active">
+            
+            <div class="weather-widget">
+                <div class="weather-info">
+                    <h3 id="weather-title">高雄市</h3>
+                    <p id="weather-desc">晴時多雲 • 19°C - 25°C</p>
+                </div>
+                <div class="weather-icon">🌤️</div>
+            </div>
+
+            <div class="date-scroll" id="date-tabs">
+                </div>
+
+            <div id="cards-container">
+                </div>
+        </div>
+
+        <div id="sec-info" class="section">
+            <div class="info-group">
+                <div class="info-header">航班資訊</div>
+                <div class="info-item">
+                    <div>
+                        <div style="font-weight:bold; font-size:16px;">去程 CI934</div>
+                        <div style="font-size:13px; color:#888; margin-top:4px;">02/19 10:30 起飛</div>
+                    </div>
+                    <span style="font-size:24px;">🛫</span>
+                </div>
+                <div class="info-item">
+                    <div>
+                        <div style="font-weight:bold; font-size:16px;">回程 CI935 / VJ885</div>
+                        <div style="font-size:13px; color:#888; margin-top:4px;">02/23 12:45/18:00 起飛</div>
+                    </div>
+                    <span style="font-size:24px;">🛬</span>
+                </div>
+            </div>
+
+            <div class="info-group">
+                <div class="info-header">住宿資訊</div>
+                <div class="card type-hotel" style="margin-bottom:0; box-shadow:var(--shadow);">
+                    <span class="card-time">入住 15:00 / 退房 11:00</span>
+                    <div class="card-title">愛河‧日央 B&B</div>
+                    <div class="card-desc">高雄市前金區</div>
+                    <a href="https://www.google.com/maps/search/?api=1&query=愛河日央" target="_blank" class="btn-nav">📍 導航前往</a>
+                </div>
+            </div>
+
+            <div class="info-group">
+                <div class="info-header">緊急聯絡</div>
+                <div class="info-item">
+                    <div>報案 / 救護</div>
+                    <div style="font-weight:bold; color:var(--accent-red); font-size:18px;">110 / 119</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="sec-budget" class="section">
+             <div class="info-header">公費預算表</div>
+             <table class="budget-table">
+                 <thead>
+                     <tr>
+                         <th>項目</th>
+                         <th>狀態</th>
+                         <th style="text-align:right;">金額</th>
+                     </tr>
+                 </thead>
+                 <tbody>
+                     <tr>
+                         <td>公費資金池</td>
+                         <td>✅ 收齊</td>
+                         <td style="text-align:right; font-weight:bold;">+20,000</td>
+                     </tr>
+                     <tr>
+                         <td>酒肉武林</td>
+                         <td>⬜️ 預估</td>
+                         <td style="text-align:right; color:#888;">-3,000</td>
+                     </tr>
+                     <tr>
+                         <td>銅花火鍋</td>
+                         <td>⬜️ 預估</td>
+                         <td style="text-align:right; color:#888;">-5,000</td>
+                     </tr>
+                     <tr>
+                         <td>越式洗髮</td>
+                         <td>⬜️ 預估</td>
+                         <td style="text-align:right; color:#888;">-3,200</td>
+                     </tr>
+                     <tr>
+                         <td style="font-weight:bold;">剩餘預估</td>
+                         <td></td>
+                         <td style="text-align:right; font-weight:bold; color:var(--accent-green);">8,800</td>
+                     </tr>
+                 </tbody>
+             </table>
+             <p style="font-size:12px; color:#999; margin-top:15px; text-align:center;">*此為靜態預估表，僅供參考</p>
+        </div>
+
+    </div>
+
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab('sec-itinerary', this)">
+            <span class="nav-icon">🗓️</span>
+            <span>行程</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('sec-info', this)">
+            <span class="nav-icon">🧳</span>
+            <span>資訊</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('sec-budget', this)">
+            <span class="nav-icon">💰</span>
+            <span>預算</span>
+        </div>
+    </nav>
+</div>
+
+<script>
+    // --- Data Source ---
+    const itinerary = [
+        {
+            date: "02/19 (四)",
+            weather: "18°C - 24°C | 舒適微涼",
+            events: [
+                { time: "10:30", title: "CI934 起飛", type: "transport", desc: "前往高雄，準備度假心情。", loc: "桃園機場" },
+                { time: "13:00", title: "機場午餐 & 集合", type: "food", desc: "與 Join Boyi 會合。", loc: "高雄小港機場" },
+                { time: "15:00", title: "飯店 Check-in", type: "hotel", desc: "放置行李，稍微休息。", loc: "愛河日央" },
+                { time: "19:30", title: "酒肉武林 (晚餐)", type: "food", desc: "🍺 精釀啤酒與燒烤。<br><b>必點：</b>武林烤肉拼盤。", loc: "酒肉武林", tags: ["BOOKING", "MUST EAT"] }
+            ]
+        },
+        {
+            date: "02/20 (五)",
+            weather: "19°C - 25°C | 晴時多雲",
+            events: [
+                { time: "08:30", title: "大ㄎㄡ胖碳烤三明治", type: "food", desc: "早餐推薦。炭火香氣十足的肉蛋吐司。", loc: "大ㄎㄡ胖碳烤三明治", tags: ["MUST EAT"] },
+                { time: "10:00", title: "駁二藝術特區", type: "spot", desc: "散步拍照。必看大港橋旋轉、微熱山丘。", loc: "駁二藝術特區" },
+                { time: "13:30", title: "壽山動物園", type: "spot", desc: "Join 初琪。走空中廊道看水豚。", loc: "壽山動物園", tags: ["ZOO"] },
+                { time: "19:40", title: "銅花精緻涮涮鍋", type: "food", desc: "🍲 火鍋界的LV，專人服務。", loc: "銅花精緻涮涮鍋", tags: ["BOOKING", "LUXURY"] }
+            ]
+        },
+        {
+            date: "02/21 (六)",
+            weather: "20°C - 26°C | 適合戶外",
+            events: [
+                { time: "09:00", title: "興隆居", type: "food", desc: "傳統早餐霸主。小心湯包燙口！", loc: "興隆居", tags: ["MUST EAT"] },
+                { time: "10:30", title: "Mystoto 密室逃脫", type: "spot", desc: "請提早10分鐘到場解說。", loc: "Mystoto密室逃脫", tags: ["BOOKING"] },
+                { time: "13:30", title: "SKM Park / 鈴鹿賽道", type: "spot", desc: "Outlet 逛街 & 卡丁車體驗。", loc: "SKM Park", tags: ["SHOPPING"] },
+                { time: "21:00", title: "不想洗頭•越式洗髮", type: "spot", desc: "💆🏻 極致放鬆：洗頭+按摩+採耳。", loc: "不想洗頭越式洗髮", tags: ["BOOKING"] }
+            ]
+        },
+        {
+            date: "02/22 (日)",
+            weather: "18°C - 24°C | 陰時多雲",
+            events: [
+                { time: "08:00", title: "大田早餐店", type: "food", desc: "古早味蛋餅與煎餃。", loc: "大田早餐店" },
+                { time: "10:30", title: "美濃一日遊", type: "spot", desc: "油紙傘體驗、客家擂茶、美濃粄條。", loc: "美濃民俗村", tags: ["CULTURE"] },
+                { time: "17:40", title: "阿香的廚房", type: "food", desc: "原住民特色料理。必點小米粽、馬告雞湯。", loc: "阿香的廚房", tags: ["BOOKING"] },
+            ]
+        },
+        {
+            date: "02/23 (一)",
+            weather: "19°C - 25°C | 旅程結束",
+            events: [
+                { time: "11:00", title: "Check-out", type: "hotel", desc: "收拾行李，準備退房。", loc: "愛河日央" },
+                { time: "12:00", title: "前往機場", type: "transport", desc: "搭乘捷運或計程車前往小港機場。", loc: "高雄小港機場" },
+                { time: "12:45 / 18:00", title: "返程航班", type: "transport", desc: "✈️ VJ885 (12:45) 或 CI935 (18:00)。", loc: "小港機場", tags: ["HOME"] }
+            ]
+        }
+    ];
+
+    // --- Logic ---
+    let currentDayIndex = 0;
+
+    function init() {
+        renderDateTabs();
+        renderCards(0);
+    }
+
+    function renderDateTabs() {
+        const container = document.getElementById('date-tabs');
+        container.innerHTML = '';
+        itinerary.forEach((day, index) => {
+            const chip = document.createElement('div');
+            chip.className = `date-chip ${index === 0 ? 'active' : ''}`;
+            chip.innerText = day.date.split(' ')[0]; 
+            chip.onclick = () => {
+                document.querySelectorAll('.date-chip').forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+                renderCards(index);
+            };
+            container.appendChild(chip);
+        });
+    }
+
+    function renderCards(dayIndex) {
+        const dayData = itinerary[dayIndex];
+        const container = document.getElementById('cards-container');
+        
+        // Update Weather Header
+        document.getElementById('weather-desc').innerText = dayData.weather;
+        document.getElementById('header-subtitle').innerText = `Day ${dayIndex + 1} • ${dayData.date}`;
+
+        container.innerHTML = '';
+        container.style.opacity = 0;
+
+        dayData.events.forEach(event => {
+            const card = document.createElement('div');
+            card.className = `card type-${event.type}`;
+            
+            // Tags HTML
+            let tagsHtml = '';
+            if (event.tags) {
+                event.tags.forEach(tag => {
+                    let tagClass = 'tag-tips';
+                    if(tag === 'BOOKING') tagClass = 'tag-booking';
+                    if(tag === 'MUST EAT') tagClass = 'tag-must';
+                    if(tag === 'SHOPPING') tagClass = 'tag-shopping';
+                    tagsHtml += `<span class="tag ${tagClass}">${tag}</span>`;
+                });
+            }
+
+            // Fixed Google Maps Link Logic for Standalone Hosting
+            const mapLink = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(event.loc + " 高雄");
+
+            card.innerHTML = `
+                <span class="card-time">${event.time}</span>
+                <div class="card-title">${event.title}</div>
+                <div class="card-desc">${event.desc}</div>
+                ${tagsHtml ? `<div style="margin-bottom:10px;">${tagsHtml}</div>` : ''}
+                <a href="${mapLink}" target="_blank" class="btn-nav">📍 導航前往</a>
+            `;
+            container.appendChild(card);
+        });
+
+        // Fade in animation
+        setTimeout(() => {
+            container.style.transition = 'opacity 0.3s';
+            container.style.opacity = 1;
+        }, 50);
+    }
+
+    function switchTab(sectionId, navElement) {
+        // Hide all sections
+        document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+        // Show target section
+        document.getElementById(sectionId).classList.add('active');
+        
+        // Update Nav UI
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        navElement.classList.add('active');
+    }
+
+    // Initialize
+    init();
+
+</script>
+
+</body>
+</html>
