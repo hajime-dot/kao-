@@ -3,133 +3,182 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Gogogo Kaohsiung</title>
+<title>Gogogo 高雄</title>
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#FFFFFF">
+<link rel="apple-touch-icon" href="https://img.icons8.com/color/180/taiwan-map.png">
 
 <style>
     :root {
-        --apple-bg: #F2F2F7;
-        --apple-card: rgba(255, 255, 255, 0.85);
-        --apple-blue: #007AFF;
-        --apple-green: #34C759;
-        --apple-red: #FF3B30;
-        --apple-text: #1C1C1E;
-        --apple-secondary: #8E8E93;
-        --radius-ios: 20px;
-        --blur: blur(20px);
+        --bg-body: #F7F9FC;
+        --bg-card: #FFFFFF;
+        
+        --primary: #4ECDC4; 
+        --primary-dark: #36B0A8;
+        --secondary: #FF6B6B; 
+        
+        --text-main: #2C3E50;
+        --text-light: #7F8C8D;
+        --text-lighter: #BDC3C7;
+
+        --shadow-soft: 0 4px 20px rgba(0,0,0,0.05);
+        --radius-l: 20px;
+        --radius-m: 14px;
+        --radius-s: 8px;
     }
 
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
     
     body {
-        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
-        background-color: var(--apple-bg);
-        color: var(--apple-text);
-        margin: 0; display: flex; justify-content: center;
-        height: 100dvh; overflow: hidden; letter-spacing: -0.02em;
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Roboto, Helvetica, Arial, sans-serif;
+        background-color: var(--bg-body);
+        margin: 0; padding: 0;
+        display: flex; justify-content: center;
+        height: 100dvh; color: var(--text-main);
+        overflow: hidden;
     }
 
     #app-container {
-        width: 100%; max-width: 500px; height: 100%;
+        width: 100%; max-width: 500px;
+        background-color: var(--bg-body);
+        height: 100%; position: relative;
         display: flex; flex-direction: column;
-        position: relative;
     }
 
-    /* --- Apple Header --- */
-    header {
-        padding: 60px 20px 20px;
-        background: rgba(242, 242, 247, 0.8);
-        backdrop-filter: var(--blur);
-        -webkit-backdrop-filter: var(--blur);
-        position: sticky; top: 0; z-index: 100;
-        text-align: left;
+    /* --- 1. Header (Static) --- */
+    header { 
+        padding: 40px 20px 10px; 
+        background: var(--bg-body);
+        flex-shrink: 0;
+        text-align: center;
     }
-    h1 { margin: 0; font-size: 34px; font-weight: 700; letter-spacing: -0.04em; }
+    h1 { 
+        margin: 0; font-size: 24px; font-weight: 800; 
+        color: var(--text-main); letter-spacing: 1px;
+    }
 
-    /* --- iOS Segmented Control --- */
+    /* --- 2. Top Nav (Tabs) --- */
     .top-nav {
-        display: flex; background: rgba(118, 118, 128, 0.12);
-        padding: 3px; border-radius: 10px;
-        margin: 0 20px 15px; flex-shrink: 0;
+        display: flex; padding: 0 15px; margin-bottom: 5px;
+        background: var(--bg-body); flex-shrink: 0;
+        position: relative; z-index: 10;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
     }
     .nav-item {
-        flex: 1; text-align: center; padding: 8px 0;
-        font-size: 13px; font-weight: 600; border-radius: 8px;
-        color: var(--apple-text); cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        flex: 1; text-align: center; padding: 12px 0;
+        font-size: 14px; font-weight: 600; color: var(--text-lighter);
+        cursor: pointer; position: relative; transition: color 0.2s;
     }
-    .nav-item.active {
-        background: #FFFFFF; box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+    .nav-item.active { color: var(--text-main); font-weight: 700; }
+    .nav-item.active::after {
+        content: ''; position: absolute; bottom: 0; left: 25%; right: 25%;
+        height: 3px; background: var(--primary); border-radius: 3px 3px 0 0;
     }
 
-    /* --- Content --- */
+    /* --- 3. Content Area --- */
     #main-content {
-        flex: 1; overflow-y: auto; padding: 0 20px 100px;
-        mask-image: linear-gradient(to bottom, transparent, black 20px, black 90%, transparent);
+        flex: 1; overflow-y: auto;
+        padding: 10px 20px 40px; 
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
     }
     #main-content::-webkit-scrollbar { display: none; }
 
-    .section { display: none; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+    .section { display: none; animation: fadeIn 0.3s ease; }
     .section.active { display: block; }
-    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* --- Cards Style --- */
+    /* --- Itinerary Components --- */
+    .date-scroll {
+        display: flex; gap: 10px; overflow-x: auto; 
+        padding: 10px 2px 15px; position: sticky; top: 0;
+        background: var(--bg-body); z-index: 5;
+    }
+    .date-scroll::-webkit-scrollbar { display: none; }
+    
+    .date-chip {
+        background: white; padding: 10px 16px; border-radius: 20px;
+        font-size: 13px; white-space: nowrap; color: var(--text-light);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.03); font-weight: 600;
+        border: 1px solid transparent; transition: all 0.2s;
+    }
+    .date-chip.active { 
+        background: var(--text-main); color: white; 
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15); transform: translateY(-1px);
+    }
+
     .card {
-        background: var(--apple-card);
-        backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
-        border-radius: var(--radius-ios); padding: 20px;
-        margin-bottom: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-        border: 1px solid rgba(255,255,255,0.3);
+        background: var(--bg-card); border-radius: var(--radius-m); padding: 18px;
+        margin-bottom: 14px; box-shadow: var(--shadow-soft);
+        position: relative; border-left: 4px solid #ddd;
     }
     
-    .card-title { font-size: 19px; font-weight: 700; margin-bottom: 4px; }
-    .card-desc { font-size: 14px; color: var(--apple-secondary); line-height: 1.4; }
+    /* Card Types */
+    .type-food { border-left-color: #F39C12; }
+    .type-spot { border-left-color: #27AE60; }
+    .type-transport { border-left-color: #3498DB; background: #F8FBFF; }
+    .type-hotel { border-left-color: #9B59B6; }
+
+    .card-row-top { display: flex; justify-content: space-between; margin-bottom: 6px; }
+    .card-time { font-family: monospace; font-size: 14px; font-weight: 700; color: var(--text-main); }
     
-    .must-do-pill {
-        display: inline-flex; align-items: center; gap: 6px;
-        background: rgba(0, 122, 255, 0.1); color: var(--apple-blue);
-        padding: 6px 12px; border-radius: 100px;
-        font-size: 12px; font-weight: 600; margin: 12px 0;
+    .card-title { font-size: 16px; font-weight: 800; color: var(--text-main); margin-bottom: 6px; line-height: 1.4; }
+    .card-desc { font-size: 13px; color: var(--text-light); line-height: 1.5; margin-bottom: 8px; }
+
+    /* Tags */
+    .tags-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .tag { font-size: 10px; padding: 4px 8px; border-radius: 6px; font-weight: 700; text-transform: uppercase; }
+    .tag-walk { background: #E8F5E9; color: #2E7D32; } /* Walking */
+    .tag-uber { background: #E8EAF6; color: #3F51B5; } /* Car/Uber */
+    .tag-metro { background: #FFF3E0; color: #E67E22; } /* Public Transport */
+    .tag-book { background: #FFEBEE; color: #C0392B; } /* Booking */
+
+    /* Must Do Box */
+    .must-do-box {
+        margin-top: 12px; padding: 8px 12px;
+        background: #FFFDE7; color: #795548;
+        font-size: 12px; border-radius: 8px;
+        display: flex; align-items: flex-start; gap: 6px;
+        line-height: 1.4; font-weight: 500;
+        border: 1px solid #FFF59D;
     }
 
-    .btn-map {
-        float: right; background: var(--apple-blue); color: white;
-        padding: 6px 16px; border-radius: 100px; font-size: 13px;
-        font-weight: 600; text-decoration: none;
-        transition: transform 0.1s ease;
+    .btn-map { 
+        float: right; margin-top: -5px; font-size: 12px; 
+        background: #F0F3F4; padding: 6px 12px; border-radius: 20px; 
+        color: var(--text-main); text-decoration: none; font-weight: 600; 
     }
-    .btn-map:active { transform: scale(0.92); }
+    .btn-map-info {
+        display: inline-block; font-size: 13px; 
+        background: var(--primary); color: white;
+        padding: 8px 16px; border-radius: 20px;
+        text-decoration: none; font-weight: bold;
+        margin-top: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
 
     /* --- Money Section --- */
-    .ios-input {
-        background: rgba(255,255,255,0.8); border: none;
-        width: 100%; padding: 14px; border-radius: 12px;
-        font-size: 16px; margin-bottom: 10px;
-    }
-    .check-grid { display: flex; flex-wrap: wrap; gap: 10px; margin: 15px 0; }
-    .check-item {
-        background: #E9E9EB; padding: 8px 16px; border-radius: 100px;
-        font-size: 14px; color: var(--apple-text); cursor: pointer;
-        transition: 0.2s;
-    }
-    .check-item.checked { background: var(--apple-text); color: white; }
+    .input-group { background: white; padding: 20px; border-radius: var(--radius-l); box-shadow: var(--shadow-soft); margin-bottom: 20px; }
+    .form-input { width: 100%; padding: 12px; border: 1px solid #EEE; border-radius: 10px; margin-bottom: 10px; font-size: 15px; }
+    .check-grid { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 15px; }
+    .check-item { padding: 6px 12px; border-radius: 15px; background: #F5F7FA; font-size: 12px; color: #999; cursor: pointer; border: 1px solid transparent; }
+    .check-item.checked { background: var(--text-main); color: white; border-color: var(--text-main); }
+    
+    .sel-btn-row { display: flex; gap: 10px; margin-bottom: 8px; }
+    .sel-btn { font-size: 11px; padding: 4px 10px; background: #EEE; border:none; border-radius: 4px; color: #666; cursor: pointer; }
 
-    .resolver-box {
-        background: white; border-radius: 18px; padding: 20px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #EEE;
+    /* --- Countdown Section --- */
+    #sec-countdown { text-align: center; padding-top: 40px; }
+    .cd-circle {
+        width: 220px; height: 220px; margin: 0 auto 30px;
+        border-radius: 50%; border: 4px solid var(--primary);
+        display: flex; flex-direction: column; justify-content: center;
+        box-shadow: 0 10px 30px rgba(78, 205, 196, 0.3);
     }
-    .balance-row {
-        display: flex; justify-content: space-between; padding: 10px 0;
-        border-bottom: 0.5px solid #EEE; font-size: 15px;
-    }
-
-    /* --- Date Scroller --- */
-    .date-scroll { display: flex; gap: 12px; overflow-x: auto; padding: 5px 0 20px; }
-    .date-scroll::-webkit-scrollbar { display: none; }
-    .date-chip {
-        min-width: 60px; text-align: center; background: white;
-        padding: 10px; border-radius: 14px; font-size: 13px;
-        color: var(--apple-secondary); box-shadow: 0 2px 6px rgba(0,0,0,0.02);
-    }
-    .date-chip.active { background: var(--apple-blue); color: white; font-weight: 700; }
+    .cd-num { font-size: 60px; font-weight: 800; color: var(--text-main); line-height: 1; }
+    .cd-txt { font-size: 14px; color: var(--text-light); text-transform: uppercase; letter-spacing: 2px; }
 
 </style>
 </head>
@@ -137,12 +186,13 @@
 
 <div id="app-container">
     <header>
-        <h1>高雄 🇹🇼</h1>
+        <h1>Gogogo 高雄 🇹🇼</h1>
     </header>
 
     <nav class="top-nav">
         <div class="nav-item active" onclick="switchTab('sec-itinerary', this)">行程</div>
-        <div class="nav-item" onclick="switchTab('sec-money', this)">結算</div>
+        <div class="nav-item" onclick="switchTab('sec-money', this)">公數</div>
+        <div class="nav-item" onclick="switchTab('sec-countdown', this)">倒數</div>
         <div class="nav-item" onclick="switchTab('sec-info', this)">資訊</div>
     </nav>
 
@@ -154,31 +204,59 @@
         </div>
 
         <div id="sec-money" class="section">
-            <div class="card">
-                <input type="text" id="m-desc" class="ios-input" placeholder="消費項目">
+            <div class="input-group">
+                <input type="text" id="m-desc" class="form-input" placeholder="消費項目 (e.g. 晚餐)">
                 <div style="display:flex; gap:10px;">
-                    <input type="number" id="m-amt" class="ios-input" placeholder="金額 (TWD)">
-                    <select id="m-payer" class="ios-input" style="width:120px;"></select>
+                    <input type="number" id="m-amt" class="form-input" placeholder="金額 ($)">
+                    <select id="m-payer" class="form-input"><option>付款人</option></select>
                 </div>
-                <div class="check-grid" id="m-targets"></div>
-                <button onclick="addExpense()" style="width:100%; background:var(--apple-blue); color:white; border:none; padding:15px; border-radius:14px; font-size:16px; font-weight:600;">記錄支出</button>
+                
+                <div class="sel-btn-row">
+                    <button class="sel-btn" onclick="toggleAllChecks(true)">全選</button>
+                    <button class="sel-btn" onclick="toggleAllChecks(false)">全不選</button>
+                </div>
+                <div id="m-targets" class="check-grid"></div>
+                
+                <button onclick="addExpense()" style="width:100%; padding:12px; background:var(--text-main); color:white; border:none; border-radius:10px; font-weight:bold;">記帳</button>
             </div>
+            <div id="balance-list" style="margin-bottom:20px;"></div>
+            <div id="history-list"></div>
+            <button onclick="clearAllData()" style="width:100%; margin-top:20px; background:none; border:none; color:#ccc;">清除所有紀錄</button>
+        </div>
 
-            <div class="resolver-box">
-                <div style="font-weight:700; font-size:18px; margin-bottom:15px;">最終結算建議</div>
-                <div id="resolve-result" style="color: var(--apple-secondary); font-size:14px;">暫無數據...</div>
-                <div id="balance-list" style="margin-top:20px;"></div>
+        <div id="sec-countdown" class="section">
+            <div id="pre-flight">
+                <div class="cd-circle">
+                    <div class="cd-num" id="cd-d">--</div>
+                    <div class="cd-txt">Days Left</div>
+                </div>
+                <div style="font-size:18px; color:var(--text-main); font-weight:600;">距離 2月19日 出發</div>
+                <div style="font-family:monospace; margin-top:10px; color:var(--primary-dark); font-size:20px;">
+                    <span id="cd-h">00</span>:<span id="cd-m">00</span>:<span id="cd-s">00</span>
+                </div>
             </div>
-
-            <div id="history-list" style="margin-top:30px;"></div>
-            <button onclick="clearData()" style="width:100%; padding:20px; color:var(--apple-red); background:none; border:none; font-size:13px;">重設所有數據</button>
+            <div id="post-flight" style="display:none;">
+                <div style="font-size:80px;">🎉</div>
+                <h2>旅途愉快!</h2>
+                <p>Welcome to Kaohsiung</p>
+            </div>
         </div>
 
         <div id="sec-info" class="section">
-            <div class="card">
-                <div class="card-title">🏨 愛河‧日央 B&B</div>
-                <div class="card-desc">Check-in: 15:00<br>前金區市中一路229號</div>
-                <a href="https://www.google.com/maps/search/?api=1&query=愛河日央" target="_blank" class="btn-map" style="float:none; display:inline-block; margin-top:15px;">導航至民宿</a>
+            <div class="card type-hotel">
+                <div class="card-title">愛河‧日央 B&B</div>
+                <div class="card-desc">高雄市前金區 • Check-in 15:00</div>
+                <a href="https://www.google.com/maps/search/?api=1&query=%E6%84%9B%E6%B2%B3%E6%97%A5%E5%A4%AE%20%E9%AB%98%E9%9B%84" target="_blank" class="btn-map-info">📍 導航至民宿</a>
+            </div>
+            <div class="card type-transport">
+                <div class="card-title">航班資訊</div>
+                <div class="card-desc">
+                    <b>HKG ↔ KHH (CI934/CI935)</b><br>
+                    去程: 19/2 10:30 (健水柏邦)<br>
+                    回程: 23/2 18:00 (全員)<br><br>
+                    <b>SGN ↔ KHH (VJ886/VJ885)</b><br>
+                    Boyi: 19/2 07:35 抵達 / 23/2 12:45 離開
+                </div>
             </div>
         </div>
 
@@ -186,55 +264,104 @@
 </div>
 
 <script>
+    // === Data & Config ===
     const members = ['水', '邦', '健', '初', '柏', 'Boyi', '琪', 'Sean'];
+    
+    // Helper to generate tag HTML based on content
+    const makeTags = (list) => {
+        if(!list) return '';
+        return list.map(t => {
+            let cls = 'tag-metro';
+            if(t.includes('行')) cls = 'tag-walk';
+            if(t.includes('Uber') || t.includes('車')) cls = 'tag-uber';
+            if(t.includes('book') || t.includes('Book')) cls = 'tag-book';
+            return `<span class="tag ${cls}">${t}</span>`;
+        }).join('');
+    };
+
     const itinerary = [
-        { date: "19/2", events: [
-            { time: "10:30", title: "起飛 HKG", desc: "健水柏邦 CI934", must: "記得填寫入台證", type: "transport" },
-            { time: "15:00", title: "Check-in", desc: "愛河日央 B&B", must: "放低行李休息一陣", type: "hotel", loc: "愛河日央" },
-            { time: "19:30", title: "酒肉武林", desc: "燒肉晚餐", must: "必點壺漬牛肋條", type: "food" }
-        ]},
-        { date: "20/2", events: [
-            { time: "08:30", title: "大ㄎㄡ胖", desc: "炭烤三明治早餐", must: "必喝鮮奶茶", type: "food" },
-            { time: "10:00", title: "駁二藝術區", desc: "文創漫步", must: "去大港橋睇轉動", type: "spot" },
-            { time: "19:40", title: "銅花火鍋", desc: "豪華涮涮鍋", must: "最後個黃金稀飯必食", type: "food" }
-        ]},
-        { date: "21/2", events: [{ time: "13:30", title: "SKM Park", desc: "Outlet & 卡丁車", must: "飆速體驗", type: "spot" }] },
-        { date: "22/2", events: [{ time: "10:30", title: "美濃一日遊", desc: "客家文化體驗", must: "畫紙傘體驗", type: "spot" }] },
-        { date: "23/2", events: [{ time: "12:45", title: "Boyi 飛機", desc: "小港機場", must: "Safe Flight!", type: "transport", loc: "高雄小港機場" }] }
+        {
+            date: "19/2 (四)",
+            events: [
+                { time: "10:30", end: "12:00", title: "起飛 HKG->KHH", type: "transport", desc: "健水柏邦出發 (CI934)", tags: ["HKG Airport"], must: "Check passport! 買定 Sim 卡" },
+                { time: "13:00", end: "14:00", title: "小港機場集合", type: "transport", desc: "與 Boyi 會合", tags: ["KHH Airport"], must: "領錢 / 悠遊卡加值" },
+                { time: "15:00", end: "", title: "Check-in 休息", type: "hotel", desc: "愛河日央 B&B", tags: ["Uber"], loc: "愛河日央", must: "放低行李，享受設計感空間" },
+                { time: "19:30", end: "21:30", title: "酒肉武林", type: "food", desc: "燒肉晚餐", tags: ["Booking", "Uber"], must: "必點：壺漬牛肋條、蔥鹽牛舌" }
+            ]
+        },
+        {
+            date: "20/2 (五)",
+            events: [
+                { time: "07:30", end: "08:30", title: "梳洗", type: "hotel", desc: "準備出門", tags: [], must: "記得搽防曬" },
+                { time: "08:30", end: "09:30", title: "大ㄎㄡ胖碳烤三明治", type: "food", desc: "人氣早餐", tags: ["行 6分鐘"], must: "招牌碳烤土司 + 鮮奶茶" },
+                { time: "10:00", end: "11:45", title: "駁二藝術特區", type: "spot", desc: "文創園區漫步", tags: ["行 14分鐘"], must: "微熱山丘拿鳳梨酥、大港橋打卡" },
+                { time: "12:00", end: "13:00", title: "CODA coffee", type: "food", desc: "午餐時間", tags: ["行 6分鐘"], must: "手沖咖啡 / 肉桂捲" },
+                { time: "13:30", end: "16:30", title: "壽山動物園", type: "spot", desc: "Join 初、琪、歡車", tags: ["Bus 56A"], must: "探訪水豚君、搭乘遊園小火車" },
+                { time: "17:15", end: "19:00", title: "新堀江商圈 / 夾子園", type: "spot", desc: "青菜樂園", tags: ["Bus 56A", "Uber 15m"], must: "夾零食、天使雞排" },
+                { time: "19:40", end: "21:30", title: "銅花精緻涮涮鍋", type: "food", desc: "豪華火鍋", tags: ["Booked", "Uber 24m"], must: "最後的黃金稀飯 (雜炊) 是本體" },
+                { time: "22:00", end: "~~", title: "返去休息", type: "hotel", desc: "晚安", tags: ["Uber 15m"], loc: "愛河日央", must: "抬腿休息" }
+            ]
+        },
+        {
+            date: "21/2 (六)",
+            events: [
+                { time: "07:30", end: "08:30", title: "梳洗", type: "hotel", desc: "Good Morning", tags: [], must: "帶行動電源" },
+                { time: "09:00", end: "10:00", title: "興隆居", type: "food", desc: "傳統早餐", tags: ["行 15分鐘"], must: "必食湯包 (要排隊)、燒餅" },
+                { time: "10:30", end: "12:00", title: "Mystoto 密室逃脫", type: "spot", desc: "燒腦時間", tags: ["Booked", "輕軌 C205"], must: "全體合作，不要吵架 XD" },
+                { time: "12:10", end: "13:00", title: "炸記 (Lunch)", type: "food", desc: "午餐", tags: ["行 10分鐘"], must: "酥脆炸雞補充熱量" },
+                { time: "13:30", end: "18:45", title: "SKM Park / 賽道樂園", type: "spot", desc: "Outlet + 卡丁車", tags: ["紅線->草衙站"], must: "鈴鹿賽道卡丁車飆車、買鞋" },
+                { time: "19:15", end: "20:30", title: "自強夜市 / 苓雅市場", type: "food", desc: "在地小吃晚餐", tags: ["紅線->三多"], must: "南豐魯肉飯、白糖粿" },
+                { time: "21:00", end: "22:15", title: "越式洗髮", type: "spot", desc: "不想洗頭 (SPA)", tags: ["Booked", "Uber 14m"], must: "全套放鬆 SPA" },
+                { time: "22:30", end: "~~", title: "返去休息", type: "hotel", desc: "晚安", tags: ["Uber 9m"], loc: "愛河日央", must: "敷個面膜" }
+            ]
+        },
+        {
+            date: "22/2 (日)",
+            events: [
+                { time: "08:00", end: "09:00", title: "大田早餐店", type: "food", desc: "早餐", tags: ["行 3分鐘"], must: "古早味粉漿蛋餅" },
+                { time: "10:30", end: "16:00", title: "美濃一日遊", type: "spot", desc: "客家文化 / 紙傘", tags: ["Uber 80m"], must: "畫紙傘體驗、食客家粄條" },
+                { time: "17:40", end: "19:30", title: "阿香的廚房", type: "food", desc: "原住民料理", tags: ["Booked"], must: "刺蔥烘蛋、山豬肉" },
+                { time: "20:30", end: "~~", title: "返去休息", type: "hotel", desc: "整理行李", tags: ["Uber"], loc: "愛河日央", must: "確認護照、執行李" }
+            ]
+        },
+        {
+            date: "23/2 (一)",
+            events: [
+                { time: "07:30", end: "09:00", title: "Check-out", type: "hotel", desc: "收拾行李", tags: [], must: "檢查有無遺留物品" },
+                { time: "09:00", end: "10:00", title: "晨間廚房", type: "food", desc: "最後早餐", tags: ["前金成功店"], must: "炒泡麵、蛋餅" },
+                { time: "12:45", end: "", title: "Boyi 飛機 (VJ885)", type: "transport", desc: "平安回家", tags: ["To SGN"], loc: "高雄小港機場", must: "Safe Flight!" },
+                { time: "16:00", end: "", title: "HK組 機場報到", type: "transport", desc: "CI935", tags: ["KHH Airport"], loc: "高雄小港機場", must: "最後衝刺買手信" }
+            ]
+        }
     ];
 
-    let expenses = JSON.parse(localStorage.getItem('khh_v4')) || [];
-
+    // === App Logic ===
     function init() {
         renderDateTabs();
         renderCards(0);
-        const pSel = document.getElementById('m-payer');
-        const tBox = document.getElementById('m-targets');
-        members.forEach(m => {
-            pSel.innerHTML += `<option value="${m}">${m}</option>`;
-            tBox.innerHTML += `<div class="check-item checked" onclick="this.classList.toggle('checked')">${m}</div>`;
-        });
-        updateUI();
+        initMoney();
+        startCountdown();
     }
 
-    function switchTab(id, el) {
+    function switchTab(secId, navEl) {
         document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
+        document.getElementById(secId).classList.add('active');
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        el.classList.add('active');
+        navEl.classList.add('active');
     }
 
+    // --- Itinerary ---
     function renderDateTabs() {
         const c = document.getElementById('date-tabs');
         itinerary.forEach((d, i) => {
             const chip = document.createElement('div');
             chip.className = `date-chip ${i===0?'active':''}`;
-            chip.innerHTML = `<div style="font-size:10px;">FEB</div><div style="font-size:16px; font-weight:700;">${d.date.split('/')[0]}</div>`;
+            chip.innerText = d.date.split(' ')[0];
             chip.onclick = () => {
                 document.querySelectorAll('.date-chip').forEach(x=>x.classList.remove('active'));
                 chip.classList.add('active');
                 renderCards(i);
-            };
+            }
             c.appendChild(chip);
         });
     }
@@ -242,104 +369,131 @@
     function renderCards(idx) {
         const c = document.getElementById('cards-container');
         c.innerHTML = '';
-        itinerary[idx].events.forEach(ev => {
-            const mapUrl = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(ev.loc || ev.title);
-            c.innerHTML += `
-                <div class="card">
+        const day = itinerary[idx];
+        day.events.forEach(ev => {
+            const card = document.createElement('div');
+            card.className = `card type-${ev.type}`;
+            
+            // Time logic
+            let timeHtml = `<span class="card-time">${ev.time}</span>`;
+            if(ev.end) timeHtml += `<span style="font-size:12px; color:#999; margin-left:5px;">- ${ev.end}</span>`;
+            
+            // Tags logic
+            const tagsHtml = ev.tags && ev.tags.length > 0 ? `<div class="tags-row">${makeTags(ev.tags)}</div>` : '';
+            
+            // Must Do logic
+            const mustHtml = ev.must ? `<div class="must-do-box">💡 ${ev.must}</div>` : '';
+
+            // Map link: Use explicit 'loc' if present, otherwise use title + 高雄
+            const queryLoc = ev.loc ? ev.loc : (ev.title + " 高雄");
+            const mapUrl = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(queryLoc);
+
+            card.innerHTML = `
+                <div class="card-row-top">
+                    <div>${timeHtml}</div>
                     <a href="${mapUrl}" target="_blank" class="btn-map">GO</a>
-                    <div class="card-desc" style="color:var(--apple-blue); font-weight:700; margin-bottom:4px;">${ev.time}</div>
-                    <div class="card-title">${ev.title}</div>
-                    <div class="card-desc">${ev.desc}</div>
-                    <div class="must-do-pill">💡 ${ev.must}</div>
-                </div>`;
+                </div>
+                <div class="card-title">${ev.title}</div>
+                <div class="card-desc">${ev.desc}</div>
+                ${mustHtml}
+                ${tagsHtml}
+            `;
+            c.appendChild(card);
         });
     }
 
-    function addExpense() {
+    // --- Money ---
+    let expenses = JSON.parse(localStorage.getItem('khh_data_v2')) || [];
+    function initMoney() {
+        const sel = document.getElementById('m-payer');
+        const box = document.getElementById('m-targets');
+        members.forEach(m => {
+            sel.innerHTML += `<option value="${m}">${m}</option>`;
+            box.innerHTML += `<div class="check-item checked" onclick="this.classList.toggle('checked')">${m}</div>`;
+        });
+        updateMoneyUI();
+    }
+    
+    // Select All / None Logic
+    window.toggleAllChecks = function(isCheck) {
+        document.querySelectorAll('.check-item').forEach(el => {
+            if(isCheck) el.classList.add('checked');
+            else el.classList.remove('checked');
+        });
+    }
+
+    window.addExpense = function() {
         const desc = document.getElementById('m-desc').value;
         const amt = parseFloat(document.getElementById('m-amt').value);
         const payer = document.getElementById('m-payer').value;
-        const targets = Array.from(document.querySelectorAll('.check-item.checked')).map(e => e.innerText);
-
-        if(!desc || isNaN(amt) || targets.length === 0) return;
+        const targets = Array.from(document.querySelectorAll('.check-item.checked')).map(e=>e.innerText);
         
-        expenses.unshift({ id: Date.now(), desc, amt, payer, targets });
-        localStorage.setItem('khh_v4', JSON.stringify(expenses));
-        updateUI();
+        if(!desc || isNaN(amt) || payer === '付款人') return alert('請填寫完整');
+        if(targets.length === 0) return alert('請至少選擇一人分擔');
+
+        expenses.unshift({id: Date.now(), desc, amt, payer, targets});
+        saveMoney();
         document.getElementById('m-desc').value = '';
         document.getElementById('m-amt').value = '';
     }
-
-    function updateUI() {
-        const balDiv = document.getElementById('balance-list');
-        const histDiv = document.getElementById('history-list');
-        const resolveDiv = document.getElementById('resolve-result');
+    function saveMoney() {
+        localStorage.setItem('khh_data_v2', JSON.stringify(expenses));
+        updateMoneyUI();
+    }
+    window.clearAllData = function() {
+        if(confirm('確定清除所有記帳資料？')) { expenses = []; saveMoney(); }
+    }
+    function updateMoneyUI() {
+        const list = document.getElementById('history-list');
+        list.innerHTML = '';
+        let bals = {}; members.forEach(m => bals[m] = 0);
         
-        balDiv.innerHTML = '';
-        histDiv.innerHTML = '<div style="font-weight:700; margin-bottom:10px;">支出紀錄</div>';
-        
-        let bals = {};
-        members.forEach(m => bals[m] = 0);
-
         expenses.forEach(e => {
             bals[e.payer] += e.amt;
-            let share = e.amt / e.targets.length;
-            e.targets.forEach(t => bals[t] -= share);
-            histDiv.innerHTML += `
-                <div class="card" style="padding:15px; margin-bottom:10px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <div>
-                            <div style="font-weight:700;">${e.desc}</div>
-                            <div style="font-size:12px; color:var(--apple-secondary);">${e.payer} 付款</div>
-                        </div>
-                        <div style="font-weight:700;">$${Math.round(e.amt)}</div>
-                    </div>
+            const split = e.amt / e.targets.length;
+            e.targets.forEach(t => bals[t] -= split);
+            
+            list.innerHTML += `
+                <div style="padding:10px 0; border-bottom:1px solid #eee; display:flex; justify-content:space-between;">
+                    <div><b>${e.desc}</b> $${e.amt} <span style="font-size:11px; color:#999;">(${e.payer})</span></div>
+                    <div style="color:red; cursor:pointer;" onclick="delExp(${e.id})">✕</div>
                 </div>`;
         });
-
-        // 夫婦合併邏輯
-        let finalBals = { ...bals };
-        const coupleSum = finalBals['琪'] + finalBals['Sean'];
-        const listToResolve = [];
-
-        Object.keys(finalBals).forEach(m => {
-            if (m === '琪' || m === 'Sean') return;
-            listToResolve.push({ name: m, amount: finalBals[m] });
-            renderBalanceRow(m, finalBals[m], balDiv);
+        window.delExp = (id) => { if(confirm('刪除?')) { expenses=expenses.filter(x=>x.id!==id); saveMoney(); }};
+        
+        const balDiv = document.getElementById('balance-list');
+        balDiv.innerHTML = '';
+        Object.keys(bals).sort((a,b)=>bals[b]-bals[a]).forEach(m => {
+            if(Math.abs(bals[m]) < 1) return;
+            const val = Math.round(bals[m]);
+            const color = val > 0 ? '#27AE60' : '#C0392B';
+            balDiv.innerHTML += `
+                <div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid #f9f9f9;">
+                    <span>${m}</span>
+                    <span style="color:${color}; font-weight:bold;">${val>0?'+':''}${val}</span>
+                </div>`;
         });
-
-        renderBalanceRow('琪 & Sean ❤️', coupleSum, balDiv);
-        listToResolve.push({ name: '琪 & Sean', amount: coupleSum });
-
-        // Debt Resolver
-        resolveDiv.innerHTML = '';
-        let debtors = listToResolve.filter(x => x.amount < -0.1).sort((a,b) => a.amount - b.amount);
-        let creditors = listToResolve.filter(x => x.amount > 0.1).sort((a,b) => b.amount - a.amount);
-
-        if (debtors.length === 0) resolveDiv.innerHTML = "所有帳目已清空 ✨";
-        else {
-            debtors.forEach(d => {
-                let dAmt = Math.abs(d.amount);
-                creditors.forEach(c => {
-                    if (dAmt <= 0 || c.amount <= 0) return;
-                    let settle = Math.min(dAmt, c.amount);
-                    resolveDiv.innerHTML += `<b>${d.name}</b> 轉帳 <b>$${Math.round(settle)}</b> 給 <b>${c.name}</b><br>`;
-                    dAmt -= settle; c.amount -= settle;
-                });
-            });
-        }
     }
 
-    function renderBalanceRow(name, amt, container) {
-        const color = amt >= 0 ? 'var(--apple-green)' : 'var(--apple-red)';
-        container.innerHTML += `
-            <div class="balance-row">
-                <span>${name}</span>
-                <span style="color:${color}; font-weight:700;">${amt > 0 ? '+' : ''}${Math.round(amt)}</span>
-            </div>`;
+    // --- Countdown ---
+    function startCountdown() {
+        const target = new Date("2026-02-19T10:30:00").getTime();
+        setInterval(() => {
+            const now = new Date().getTime();
+            const diff = target - now;
+            
+            if(diff < 0) {
+                document.getElementById('pre-flight').style.display = 'none';
+                document.getElementById('post-flight').style.display = 'block';
+                return;
+            }
+            
+            document.getElementById('cd-d').innerText = Math.floor(diff / (1000*60*60*24));
+            document.getElementById('cd-h').innerText = String(Math.floor((diff % (1000*60*60*24))/(1000*60*60))).padStart(2,'0');
+            document.getElementById('cd-m').innerText = String(Math.floor((diff % (1000*60*60))/(1000*60))).padStart(2,'0');
+            document.getElementById('cd-s').innerText = String(Math.floor((diff % (1000*60))/1000)).padStart(2,'0');
+        }, 1000);
     }
-
-    function clearData() { if(confirm('確定清除嗎？')) { expenses=[]; localStorage.setItem('khh_v4', '[]'); updateUI(); } }
 
     init();
 </script>
