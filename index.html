@@ -8,7 +8,6 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#FFFFFF">
-<link rel="apple-touch-icon" href="https://img.icons8.com/color/180/taiwan-map.png">
 
 <style>
     :root {
@@ -169,6 +168,15 @@
     .sel-btn-row { display: flex; gap: 10px; margin-bottom: 8px; }
     .sel-btn { font-size: 11px; padding: 4px 10px; background: #EEE; border:none; border-radius: 4px; color: #666; cursor: pointer; }
 
+    /* New Resolver Box */
+    .resolver-box {
+        background: #E8F5E9; 
+        border: 1px dashed #66BB6A;
+        padding: 15px; 
+        border-radius: var(--radius-m); 
+        margin-bottom: 20px;
+    }
+
     /* --- Countdown Section --- */
     #sec-countdown { text-align: center; padding-top: 40px; }
     .cd-circle {
@@ -219,7 +227,16 @@
                 
                 <button onclick="addExpense()" style="width:100%; padding:12px; background:var(--text-main); color:white; border:none; border-radius:10px; font-weight:bold;">記帳</button>
             </div>
+            
+            <div id="resolver-container" class="resolver-box">
+                <div style="font-weight:bold; margin-bottom:10px; font-size:14px; color:#2E7D32;">💡 建議結算 (琪 & Sean 合併)</div>
+                <div id="resolve-list" style="font-size:13px; line-height:1.6;"></div>
+            </div>
+
+            <div style="margin-bottom:10px; font-weight:bold; font-size:14px;">各人結餘 (負數=欠錢)</div>
             <div id="balance-list" style="margin-bottom:20px;"></div>
+            
+            <div style="margin-bottom:10px; font-weight:bold; font-size:14px;">歷史紀錄</div>
             <div id="history-list"></div>
             <button onclick="clearAllData()" style="width:100%; margin-top:20px; background:none; border:none; color:#ccc;">清除所有紀錄</button>
         </div>
@@ -384,7 +401,7 @@
             // Must Do logic
             const mustHtml = ev.must ? `<div class="must-do-box">💡 ${ev.must}</div>` : '';
 
-            // Map link: Use explicit 'loc' if present, otherwise use title + 高雄
+            // Map link
             const queryLoc = ev.loc ? ev.loc : (ev.title + " 高雄");
             const mapUrl = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(queryLoc);
 
@@ -436,16 +453,26 @@
         document.getElementById('m-desc').value = '';
         document.getElementById('m-amt').value = '';
     }
+    
     function saveMoney() {
         localStorage.setItem('khh_data_v2', JSON.stringify(expenses));
         updateMoneyUI();
     }
+    
     window.clearAllData = function() {
         if(confirm('確定清除所有記帳資料？')) { expenses = []; saveMoney(); }
     }
+    
     function updateMoneyUI() {
         const list = document.getElementById('history-list');
+        const balDiv = document.getElementById('balance-list');
+        const resolveDiv = document.getElementById('resolve-list');
+
         list.innerHTML = '';
+        balDiv.innerHTML = '';
+        resolveDiv.innerHTML = '';
+
+        // 1. Calculate Individual Balances
         let bals = {}; members.forEach(m => bals[m] = 0);
         
         expenses.forEach(e => {
@@ -459,13 +486,30 @@
                     <div style="color:red; cursor:pointer;" onclick="delExp(${e.id})">✕</div>
                 </div>`;
         });
-        window.delExp = (id) => { if(confirm('刪除?')) { expenses=expenses.filter(x=>x.id!==id); saveMoney(); }};
+
+        // 2. Merge Couples & Prepare for Resolution
+        let finalBals = {};
+        let coupleSum = 0;
+        let resolveList = [];
+
+        Object.keys(bals).forEach(m => {
+            // Logic: if person is Kee or Sean, add to coupleSum, else normal
+            if(m === '琪' || m === 'Sean') {
+                coupleSum += bals[m];
+            } else {
+                finalBals[m] = bals[m];
+                resolveList.push({ name: m, val: bals[m] });
+            }
+        });
         
-        const balDiv = document.getElementById('balance-list');
-        balDiv.innerHTML = '';
-        Object.keys(bals).sort((a,b)=>bals[b]-bals[a]).forEach(m => {
-            if(Math.abs(bals[m]) < 1) return;
-            const val = Math.round(bals[m]);
+        // Add couple to lists
+        finalBals['琪 & Sean ❤️'] = coupleSum;
+        resolveList.push({ name: '琪 & Sean', val: coupleSum });
+
+        // 3. Render Balance List (Visual)
+        Object.keys(finalBals).sort((a,b)=>finalBals[b]-finalBals[a]).forEach(m => {
+            const val = Math.round(finalBals[m]);
+            if(Math.abs(val) < 1) return; // Skip zero balance
             const color = val > 0 ? '#27AE60' : '#C0392B';
             balDiv.innerHTML += `
                 <div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid #f9f9f9;">
@@ -473,6 +517,29 @@
                     <span style="color:${color}; font-weight:bold;">${val>0?'+':''}${val}</span>
                 </div>`;
         });
+
+        // 4. Debt Resolver (Greedy Algorithm)
+        let debtors = resolveList.filter(x => x.val < -1).sort((a,b) => a.val - b.val); // Ascending (most debt first)
+        let creditors = resolveList.filter(x => x.val > 1).sort((a,b) => b.val - a.val); // Descending (most credit first)
+
+        if(debtors.length === 0 && creditors.length === 0) {
+            resolveDiv.innerHTML = "🎉 目前沒有欠款！";
+        } else {
+            debtors.forEach(d => {
+                let debtAmt = Math.abs(d.val);
+                creditors.forEach(c => {
+                    if(debtAmt < 0.1 || c.val < 0.1) return;
+                    
+                    let settle = Math.min(debtAmt, c.val);
+                    resolveDiv.innerHTML += `➡️ <b>${d.name}</b> 俾 $${Math.round(settle)} 俾 <b>${c.name}</b><br>`;
+                    
+                    debtAmt -= settle;
+                    c.val -= settle;
+                });
+            });
+        }
+        
+        window.delExp = (id) => { if(confirm('刪除?')) { expenses=expenses.filter(x=>x.id!==id); saveMoney(); }};
     }
 
     // --- Countdown ---
