@@ -135,6 +135,16 @@
     .tag-metro { background: #FFF3E0; color: #E67E22; } /* Public Transport */
     .tag-book { background: #FFEBEE; color: #C0392B; } /* Booking */
 
+    /* Must Do Box */
+    .must-do-box {
+        margin-top: 12px; padding: 8px 12px;
+        background: #FFFDE7; color: #795548;
+        font-size: 12px; border-radius: 8px;
+        display: flex; align-items: flex-start; gap: 6px;
+        line-height: 1.4; font-weight: 500;
+        border: 1px solid #FFF59D;
+    }
+
     .btn-map { 
         float: right; margin-top: -5px; font-size: 12px; 
         background: #F0F3F4; padding: 6px 12px; border-radius: 20px; 
@@ -153,9 +163,12 @@
     .input-group { background: white; padding: 20px; border-radius: var(--radius-l); box-shadow: var(--shadow-soft); margin-bottom: 20px; }
     .form-input { width: 100%; padding: 12px; border: 1px solid #EEE; border-radius: 10px; margin-bottom: 10px; font-size: 15px; }
     .check-grid { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 15px; }
-    .check-item { padding: 6px 12px; border-radius: 15px; background: #F5F7FA; font-size: 12px; color: #999; cursor: pointer; }
-    .check-item.checked { background: var(--text-main); color: white; }
+    .check-item { padding: 6px 12px; border-radius: 15px; background: #F5F7FA; font-size: 12px; color: #999; cursor: pointer; border: 1px solid transparent; }
+    .check-item.checked { background: var(--text-main); color: white; border-color: var(--text-main); }
     
+    .sel-btn-row { display: flex; gap: 10px; margin-bottom: 8px; }
+    .sel-btn { font-size: 11px; padding: 4px 10px; background: #EEE; border:none; border-radius: 4px; color: #666; cursor: pointer; }
+
     /* --- Countdown Section --- */
     #sec-countdown { text-align: center; padding-top: 40px; }
     .cd-circle {
@@ -197,7 +210,13 @@
                     <input type="number" id="m-amt" class="form-input" placeholder="金額 ($)">
                     <select id="m-payer" class="form-input"><option>付款人</option></select>
                 </div>
+                
+                <div class="sel-btn-row">
+                    <button class="sel-btn" onclick="toggleAllChecks(true)">全選</button>
+                    <button class="sel-btn" onclick="toggleAllChecks(false)">全不選</button>
+                </div>
                 <div id="m-targets" class="check-grid"></div>
+                
                 <button onclick="addExpense()" style="width:100%; padding:12px; background:var(--text-main); color:white; border:none; border-radius:10px; font-weight:bold;">記帳</button>
             </div>
             <div id="balance-list" style="margin-bottom:20px;"></div>
@@ -264,54 +283,54 @@
         {
             date: "19/2 (四)",
             events: [
-                { time: "10:30", end: "12:00", title: "起飛 HKG->KHH", type: "transport", desc: "健水柏邦出發 (CI934)", tags: ["HKG Airport"] },
-                { time: "13:00", end: "14:00", title: "小港機場集合", type: "transport", desc: "與 Boyi 會合", tags: ["KHH Airport"] },
-                { time: "15:00", end: "", title: "Check-in 休息", type: "hotel", desc: "愛河日央 B&B", tags: ["Uber"] },
-                { time: "19:30", end: "21:30", title: "酒肉武林", type: "food", desc: "燒肉晚餐", tags: ["Booking", "Uber"] }
+                { time: "10:30", end: "12:00", title: "起飛 HKG->KHH", type: "transport", desc: "健水柏邦出發 (CI934)", tags: ["HKG Airport"], must: "Check passport! 買定 Sim 卡" },
+                { time: "13:00", end: "14:00", title: "小港機場集合", type: "transport", desc: "與 Boyi 會合", tags: ["KHH Airport"], must: "領錢 / 悠遊卡加值" },
+                { time: "15:00", end: "", title: "Check-in 休息", type: "hotel", desc: "愛河日央 B&B", tags: ["Uber"], loc: "愛河日央", must: "放低行李，享受設計感空間" },
+                { time: "19:30", end: "21:30", title: "酒肉武林", type: "food", desc: "燒肉晚餐", tags: ["Booking", "Uber"], must: "必點：壺漬牛肋條、蔥鹽牛舌" }
             ]
         },
         {
             date: "20/2 (五)",
             events: [
-                { time: "07:30", end: "08:30", title: "梳洗", type: "hotel", desc: "準備出門", tags: [] },
-                { time: "08:30", end: "09:30", title: "大ㄎㄡ胖碳烤三明治", type: "food", desc: "人氣早餐", tags: ["行 6分鐘"] },
-                { time: "10:00", end: "11:45", title: "駁二藝術特區", type: "spot", desc: "文創園區漫步", tags: ["行 14分鐘"] },
-                { time: "12:00", end: "13:00", title: "CODA coffee", type: "food", desc: "午餐時間", tags: ["行 6分鐘"] },
-                { time: "13:30", end: "16:30", title: "壽山動物園", type: "spot", desc: "Join 初、琪、歡車", tags: ["Bus 56A"] },
-                { time: "17:15", end: "19:00", title: "新堀江商圈 / 夾子園", type: "spot", desc: "青菜樂園", tags: ["Bus 56A", "Uber 15m"] },
-                { time: "19:40", end: "21:30", title: "銅花精緻涮涮鍋", type: "food", desc: "豪華火鍋", tags: ["Booked", "Uber 24m"] },
-                { time: "22:00", end: "~~", title: "返去休息", type: "hotel", desc: "晚安", tags: ["Uber 15m"], loc: "愛河日央" }
+                { time: "07:30", end: "08:30", title: "梳洗", type: "hotel", desc: "準備出門", tags: [], must: "記得搽防曬" },
+                { time: "08:30", end: "09:30", title: "大ㄎㄡ胖碳烤三明治", type: "food", desc: "人氣早餐", tags: ["行 6分鐘"], must: "招牌碳烤土司 + 鮮奶茶" },
+                { time: "10:00", end: "11:45", title: "駁二藝術特區", type: "spot", desc: "文創園區漫步", tags: ["行 14分鐘"], must: "微熱山丘拿鳳梨酥、大港橋打卡" },
+                { time: "12:00", end: "13:00", title: "CODA coffee", type: "food", desc: "午餐時間", tags: ["行 6分鐘"], must: "手沖咖啡 / 肉桂捲" },
+                { time: "13:30", end: "16:30", title: "壽山動物園", type: "spot", desc: "Join 初、琪、歡車", tags: ["Bus 56A"], must: "探訪水豚君、搭乘遊園小火車" },
+                { time: "17:15", end: "19:00", title: "新堀江商圈 / 夾子園", type: "spot", desc: "青菜樂園", tags: ["Bus 56A", "Uber 15m"], must: "夾零食、天使雞排" },
+                { time: "19:40", end: "21:30", title: "銅花精緻涮涮鍋", type: "food", desc: "豪華火鍋", tags: ["Booked", "Uber 24m"], must: "最後的黃金稀飯 (雜炊) 是本體" },
+                { time: "22:00", end: "~~", title: "返去休息", type: "hotel", desc: "晚安", tags: ["Uber 15m"], loc: "愛河日央", must: "抬腿休息" }
             ]
         },
         {
             date: "21/2 (六)",
             events: [
-                { time: "07:30", end: "08:30", title: "梳洗", type: "hotel", desc: "Good Morning", tags: [] },
-                { time: "09:00", end: "10:00", title: "興隆居", type: "food", desc: "傳統早餐", tags: ["行 15分鐘"] },
-                { time: "10:30", end: "12:00", title: "Mystoto 密室逃脫", type: "spot", desc: "燒腦時間", tags: ["Booked", "輕軌 C205"] },
-                { time: "12:10", end: "13:00", title: "炸記 (Lunch)", type: "food", desc: "午餐", tags: ["行 10分鐘"] },
-                { time: "13:30", end: "18:45", title: "SKM Park / 賽道樂園", type: "spot", desc: "Outlet + 卡丁車", tags: ["紅線->草衙站"] },
-                { time: "19:15", end: "20:30", title: "自強夜市 / 苓雅市場", type: "food", desc: "在地小吃晚餐", tags: ["紅線->三多"] },
-                { time: "21:00", end: "22:15", title: "越式洗髮", type: "spot", desc: "不想洗頭 (SPA)", tags: ["Booked", "Uber 14m"] },
-                { time: "22:30", end: "~~", title: "返去休息", type: "hotel", desc: "晚安", tags: ["Uber 9m"], loc: "愛河日央" }
+                { time: "07:30", end: "08:30", title: "梳洗", type: "hotel", desc: "Good Morning", tags: [], must: "帶行動電源" },
+                { time: "09:00", end: "10:00", title: "興隆居", type: "food", desc: "傳統早餐", tags: ["行 15分鐘"], must: "必食湯包 (要排隊)、燒餅" },
+                { time: "10:30", end: "12:00", title: "Mystoto 密室逃脫", type: "spot", desc: "燒腦時間", tags: ["Booked", "輕軌 C205"], must: "全體合作，不要吵架 XD" },
+                { time: "12:10", end: "13:00", title: "炸記 (Lunch)", type: "food", desc: "午餐", tags: ["行 10分鐘"], must: "酥脆炸雞補充熱量" },
+                { time: "13:30", end: "18:45", title: "SKM Park / 賽道樂園", type: "spot", desc: "Outlet + 卡丁車", tags: ["紅線->草衙站"], must: "鈴鹿賽道卡丁車飆車、買鞋" },
+                { time: "19:15", end: "20:30", title: "自強夜市 / 苓雅市場", type: "food", desc: "在地小吃晚餐", tags: ["紅線->三多"], must: "南豐魯肉飯、白糖粿" },
+                { time: "21:00", end: "22:15", title: "越式洗髮", type: "spot", desc: "不想洗頭 (SPA)", tags: ["Booked", "Uber 14m"], must: "全套放鬆 SPA" },
+                { time: "22:30", end: "~~", title: "返去休息", type: "hotel", desc: "晚安", tags: ["Uber 9m"], loc: "愛河日央", must: "敷個面膜" }
             ]
         },
         {
             date: "22/2 (日)",
             events: [
-                { time: "08:00", end: "09:00", title: "大田早餐店", type: "food", desc: "早餐", tags: ["行 3分鐘"] },
-                { time: "10:30", end: "16:00", title: "美濃一日遊", type: "spot", desc: "客家文化 / 紙傘", tags: ["Uber 80m"] },
-                { time: "17:40", end: "19:30", title: "阿香的廚房", type: "food", desc: "原住民料理", tags: ["Booked"] },
-                { time: "20:30", end: "~~", title: "返去休息", type: "hotel", desc: "整理行李", tags: ["Uber"], loc: "愛河日央" }
+                { time: "08:00", end: "09:00", title: "大田早餐店", type: "food", desc: "早餐", tags: ["行 3分鐘"], must: "古早味粉漿蛋餅" },
+                { time: "10:30", end: "16:00", title: "美濃一日遊", type: "spot", desc: "客家文化 / 紙傘", tags: ["Uber 80m"], must: "畫紙傘體驗、食客家粄條" },
+                { time: "17:40", end: "19:30", title: "阿香的廚房", type: "food", desc: "原住民料理", tags: ["Booked"], must: "刺蔥烘蛋、山豬肉" },
+                { time: "20:30", end: "~~", title: "返去休息", type: "hotel", desc: "整理行李", tags: ["Uber"], loc: "愛河日央", must: "確認護照、執行李" }
             ]
         },
         {
             date: "23/2 (一)",
             events: [
-                { time: "07:30", end: "09:00", title: "Check-out", type: "hotel", desc: "收拾行李", tags: [] },
-                { time: "09:00", end: "10:00", title: "晨間廚房", type: "food", desc: "最後早餐", tags: ["前金成功店"] },
-                { time: "12:45", end: "", title: "Boyi 飛機 (VJ885)", type: "transport", desc: "平安回家", tags: ["To SGN"] },
-                { time: "16:00", end: "", title: "HK組 機場報到", type: "transport", desc: "CI935", tags: ["KHH Airport"] }
+                { time: "07:30", end: "09:00", title: "Check-out", type: "hotel", desc: "收拾行李", tags: [], must: "檢查有無遺留物品" },
+                { time: "09:00", end: "10:00", title: "晨間廚房", type: "food", desc: "最後早餐", tags: ["前金成功店"], must: "炒泡麵、蛋餅" },
+                { time: "12:45", end: "", title: "Boyi 飛機 (VJ885)", type: "transport", desc: "平安回家", tags: ["To SGN"], loc: "高雄小港機場", must: "Safe Flight!" },
+                { time: "16:00", end: "", title: "HK組 機場報到", type: "transport", desc: "CI935", tags: ["KHH Airport"], loc: "高雄小港機場", must: "最後衝刺買手信" }
             ]
         }
     ];
@@ -362,6 +381,9 @@
             // Tags logic
             const tagsHtml = ev.tags && ev.tags.length > 0 ? `<div class="tags-row">${makeTags(ev.tags)}</div>` : '';
             
+            // Must Do logic
+            const mustHtml = ev.must ? `<div class="must-do-box">💡 ${ev.must}</div>` : '';
+
             // Map link: Use explicit 'loc' if present, otherwise use title + 高雄
             const queryLoc = ev.loc ? ev.loc : (ev.title + " 高雄");
             const mapUrl = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(queryLoc);
@@ -373,6 +395,7 @@
                 </div>
                 <div class="card-title">${ev.title}</div>
                 <div class="card-desc">${ev.desc}</div>
+                ${mustHtml}
                 ${tagsHtml}
             `;
             c.appendChild(card);
@@ -390,6 +413,15 @@
         });
         updateMoneyUI();
     }
+    
+    // Select All / None Logic
+    window.toggleAllChecks = function(isCheck) {
+        document.querySelectorAll('.check-item').forEach(el => {
+            if(isCheck) el.classList.add('checked');
+            else el.classList.remove('checked');
+        });
+    }
+
     window.addExpense = function() {
         const desc = document.getElementById('m-desc').value;
         const amt = parseFloat(document.getElementById('m-amt').value);
@@ -397,7 +429,8 @@
         const targets = Array.from(document.querySelectorAll('.check-item.checked')).map(e=>e.innerText);
         
         if(!desc || isNaN(amt) || payer === '付款人') return alert('請填寫完整');
-        
+        if(targets.length === 0) return alert('請至少選擇一人分擔');
+
         expenses.unshift({id: Date.now(), desc, amt, payer, targets});
         saveMoney();
         document.getElementById('m-desc').value = '';
