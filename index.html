@@ -231,6 +231,10 @@
             <div id="resolver-container" class="resolver-box">
                 <div style="font-weight:bold; margin-bottom:10px; font-size:14px; color:#2E7D32;">💡 建議結算 (琪 & Sean 合併)</div>
                 <div id="resolve-list" style="font-size:13px; line-height:1.6;"></div>
+                
+                <button onclick="shareSettlement()" style="width:100%; margin-top:15px; background:#25D366; color:white; border:none; padding:10px; border-radius:10px; font-weight:bold; display:flex; align-items:center; justify-content:center; gap:8px; cursor:pointer;">
+                    <span style="font-size:16px;">💬</span> 發送結算單到 Group
+                </button>
             </div>
 
             <div style="margin-bottom:10px; font-weight:bold; font-size:14px;">各人結餘 (負數=欠錢)</div>
@@ -560,6 +564,32 @@
             document.getElementById('cd-m').innerText = String(Math.floor((diff % (1000*60*60))/(1000*60))).padStart(2,'0');
             document.getElementById('cd-s').innerText = String(Math.floor((diff % (1000*60))/1000)).padStart(2,'0');
         }, 1000);
+    }
+
+    // === NEW FUNCTION: WhatsApp Settlement Share ===
+    function shareSettlement() {
+        const div = document.getElementById('resolve-list');
+        // Get the text content from the calculated list
+        let content = div.innerText;
+
+        // Basic validation
+        if (!content || content.trim() === "" || content.includes("目前沒有欠款")) {
+            alert("目前顯示沒有債務，請確認是否已點擊「計算」或大家剛好平手！");
+            return;
+        }
+
+        // Format the message for WhatsApp
+        // innerText automatically converts <br> to newlines in most browsers
+        let report = `📊 *[高雄之旅 - 最終結算]*\n\n`;
+        report += content; 
+        report += `\n\n------------------\n`;
+        report += `請大家依照金額 PayMe / 轉數快 給對方啦！💸`;
+
+        // Create WhatsApp URL
+        const url = `https://wa.me/?text=${encodeURIComponent(report)}`;
+        
+        // Open WhatsApp
+        window.open(url, '_blank');
     }
 
     init();
