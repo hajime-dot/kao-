@@ -60,7 +60,7 @@
 
     /* --- 2. Top Nav (Tabs) --- */
     .top-nav {
-        display: flex; padding: 0 15px; margin-bottom: 5px;
+        display: flex; padding: 0 10px; margin-bottom: 5px;
         background: var(--bg-body); flex-shrink: 0;
         position: relative; z-index: 10;
         border-bottom: 1px solid rgba(0,0,0,0.05);
@@ -72,7 +72,7 @@
     }
     .nav-item.active { color: var(--text-main); font-weight: 700; }
     .nav-item.active::after {
-        content: ''; position: absolute; bottom: 0; left: 25%; right: 25%;
+        content: ''; position: absolute; bottom: 0; left: 20%; right: 20%;
         height: 3px; background: var(--primary); border-radius: 3px 3px 0 0;
     }
 
@@ -119,6 +119,7 @@
     .type-spot { border-left-color: #27AE60; }
     .type-transport { border-left-color: #3498DB; background: #F8FBFF; }
     .type-hotel { border-left-color: #9B59B6; }
+    .type-photo { border-left-color: var(--primary); }
 
     .card-row-top { display: flex; justify-content: space-between; margin-bottom: 6px; }
     .card-time { font-family: monospace; font-size: 14px; font-weight: 700; color: var(--text-main); }
@@ -202,6 +203,7 @@
         <div class="nav-item" onclick="switchTab('sec-money', this)">公數</div>
         <div class="nav-item" onclick="switchTab('sec-countdown', this)">倒數</div>
         <div class="nav-item" onclick="switchTab('sec-info', this)">資訊</div>
+        <div class="nav-item" onclick="switchTab('sec-photo', this)">合照</div>
     </nav>
 
     <div id="main-content">
@@ -278,6 +280,22 @@
                     <b>SGN ↔ KHH (VJ886/VJ885)</b><br>
                     Boyi: 19/2 07:35 抵達 / 23/2 12:45 離開
                 </div>
+            </div>
+        </div>
+
+        <div id="sec-photo" class="section">
+            <div class="card type-photo" style="text-align: center; padding: 30px 20px;">
+                <div style="font-size: 50px; margin-bottom: 10px;">🎊</div>
+                <h2 style="margin-top: 0; margin-bottom: 10px; color: var(--text-main);">旅行完結，多謝大家！</h2>
+                <p style="color: var(--text-light); font-size: 14px; margin-bottom: 25px;">這是一趟美好的旅程，期待我們下次再出發！</p>
+                
+                <div style="border-radius: var(--radius-m); overflow: hidden; box-shadow: var(--shadow-soft);">
+                    <img src="https://drive.google.com/uc?export=view&id=1nsw5kz_rNi9KLqQo40mXWLMPEjqhISxn" alt="高雄旅行合照" style="width: 100%; height: auto; display: block; object-fit: cover;">
+                </div>
+                
+                <a href="https://drive.google.com/file/d/1nsw5kz_rNi9KLqQo40mXWLMPEjqhISxn/view?usp=drivesdk" target="_blank" class="btn-map-info" style="margin-top: 20px; display: inline-block;">
+                    🔍 查看原圖 / 下載
+                </a>
             </div>
         </div>
 
